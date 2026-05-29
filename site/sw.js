@@ -1,4 +1,4 @@
-const CACHE = "justsayno-offline-v2";
+const CACHE = "justsayno-offline-v3";
 
 const ASSETS = [
   "/",
