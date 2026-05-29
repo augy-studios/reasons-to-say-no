@@ -1,7 +1,7 @@
 {
-    "name": "Template by UwU Apps",
-    "short_name": "UwU Template",
-    "description": "A simple template app; view live template at a glance!",
+    "name": "Reasons to Say No by UwU Apps",
+    "short_name": "No",
+    "description": "A thousand reasons to say NO on demand.",
     "icons": [{
         "src": "templateicon1.png",
         "type": "image/png",
@@ -25,8 +25,8 @@
     "background_color": "#cfc",
     "display": "standalone",
     "display_override": ["fullscreen", "minimal-ui", "window-controls-overlay"],
-    "orientation": "portrait-primary",
-    "id": "template",
+    "orientation": "any",
+    "id": "justsayno",
     "dir": "ltr",
     "scope": "/",
     "lang": "en",
