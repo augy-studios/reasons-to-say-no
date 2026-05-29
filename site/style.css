@@ -457,13 +457,10 @@ a {
   justify-content: center;
   padding: 20px;
   pointer-events: none;
-  opacity: 0;
-  transition: opacity var(--mid) var(--ease);
 }
 
 .modal.open {
   pointer-events: all;
-  opacity: 1;
 }
 
 .modal-backdrop {
@@ -472,6 +469,12 @@ a {
   background: rgba(0, 0, 0, 0.22);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
+  opacity: 0;
+  transition: opacity var(--mid) var(--ease);
+}
+
+.modal.open .modal-backdrop {
+  opacity: 1;
 }
 
 .modal-sheet {
@@ -483,11 +486,13 @@ a {
   max-width: 480px;
   max-height: 82vh;
   overflow-y: auto;
+  opacity: 0;
   transform: scale(0.94) translateY(10px);
-  transition: transform var(--mid) var(--spring);
+  transition: transform var(--mid) var(--spring), opacity var(--mid) var(--ease);
 }
 
 .modal.open .modal-sheet {
+  opacity: 1;
   transform: scale(1) translateY(0);
 }
 
