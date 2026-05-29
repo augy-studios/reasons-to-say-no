@@ -1,0 +1,8 @@
+{
+    "name": "reasons-to-say-no",
+    "version": "1.0.0",
+    "description": "Reasons to Say No",
+    "dependencies": {
+        "@supabase/supabase-js": "^2.45.4"
+    }
+}

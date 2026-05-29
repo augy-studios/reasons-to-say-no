@@ -22,12 +22,17 @@
     <meta charset="utf-8">
     <title>Reasons to Say No | UwU Apps</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="A thousand reasons to say NO on demand.">
+    <meta name="description" content="Get a compelling reason to say no, whenever you need one.">
 
     <meta property="og:type" content="website">
     <meta property="og:title" content="Reasons to Say No | UwU Apps" />
     <meta property="og:site_name" content="UwU Apps" />
-    <meta property="og:description" content="A thousand reasons to say NO on demand." />
+    <meta property="og:description" content="Get a compelling reason to say no, whenever you need one." />
+
+    <meta name="theme-color" content="#ccffcc" id="metaThemeColour" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Say No" />
 
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Jua">
     <link rel="stylesheet" href="/style.css">
@@ -46,16 +51,214 @@
 </head>
 
 <body>
-    Reasons to Say No
+    <!-- ============================================================
+       X ANIMATION OVERLAY
+       ============================================================ -->
+    <div class="x-overlay" id="xOverlay" aria-hidden="true">
+        <svg class="x-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" role="presentation">
+            <line x1="20" y1="20" x2="180" y2="180" stroke="#ef4444" stroke-width="18" stroke-linecap="round" />
+            <line x1="180" y1="20" x2="20" y2="180" stroke="#ef4444" stroke-width="18" stroke-linecap="round" />
+        </svg>
+    </div>
+
+    <!-- Toast notification container -->
+    <div class="toast-container" id="toastContainer" aria-live="polite" aria-atomic="true"></div>
+
+    <!-- ============================================================
+       NAVIGATION
+       ============================================================ -->
+    <nav class="navbar" role="navigation" aria-label="Main navigation">
+        <div class="nav-brand">
+            <svg class="brand-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none"
+                aria-hidden="true">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" />
+                <line x1="8" y1="8" x2="16" y2="16" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" />
+                <line x1="16" y1="8" x2="8" y2="16" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" />
+            </svg>
+            <span class="nav-title">Reasons to Say No</span>
+        </div>
+
+        <div class="nav-actions">
+
+            <!-- API Docs -->
+            <a href="https://docs.api.uwuapps.org/no" target="_blank" rel="noopener noreferrer" class="nav-pill"
+                title="API Documentation" aria-label="Open API Documentation">
+                <svg class="icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    aria-hidden="true">
+                    <polyline points="16 18 22 12 16 6" />
+                    <polyline points="8 6 2 12 8 18" />
+                </svg>
+                <span class="nav-label">API Docs</span>
+            </a>
+
+            <!-- Favourites -->
+            <button class="nav-pill" id="favouritesNavBtn" title="Favourites" aria-label="Open Favourites">
+                <svg class="icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    aria-hidden="true">
+                    <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+                </svg>
+                <span class="nav-label">Favourites</span>
+                <span class="fav-badge" id="favBadge" aria-live="polite"></span>
+            </button>
+
+            <!-- Theme Picker -->
+            <button class="nav-pill icon-only" id="themeNavBtn" title="Change Theme" aria-label="Open theme picker">
+                <svg class="icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    aria-hidden="true">
+                    <circle cx="13.5" cy="6.5" r="1" fill="currentColor" stroke="none" />
+                    <circle cx="17.5" cy="10.5" r="1" fill="currentColor" stroke="none" />
+                    <circle cx="8.5" cy="7.5" r="1" fill="currentColor" stroke="none" />
+                    <circle cx="6.5" cy="12.5" r="1" fill="currentColor" stroke="none" />
+                    <path
+                        d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z" />
+                </svg>
+            </button>
+
+            <!-- Buy Augy a Coffee -->
+            <a href="https://donate.stripe.com/28o2akeAr3hv0DK6oo" target="_blank" rel="noopener noreferrer"
+                class="nav-pill icon-only coffee-pill" title="Buy Augy a Coffee" aria-label="Buy Augy a Coffee">
+                <svg class="icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    aria-hidden="true">
+                    <path d="M18 8h1a4 4 0 0 1 0 8h-1" />
+                    <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z" />
+                    <line x1="6" y1="1" x2="6" y2="4" />
+                    <line x1="10" y1="1" x2="10" y2="4" />
+                    <line x1="14" y1="1" x2="14" y2="4" />
+                </svg>
+            </a>
+
+        </div>
+    </nav>
+
+    <!-- ============================================================
+       MAIN CONTENT
+       ============================================================ -->
+    <main class="main" role="main">
+        <div class="reason-card glass" id="reasonCard">
+
+            <p class="reason-eyebrow">Your reason to say no</p>
+
+            <p class="reason-text" id="reasonText" aria-live="polite" aria-label="Generated reason to say no">
+                Finding a reason for you...
+            </p>
+
+            <div class="card-actions" role="group" aria-label="Reason actions">
+
+                <!-- Regenerate -->
+                <button class="action-btn" id="regenerateBtn" title="Regenerate" aria-label="Generate a new reason">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor"
+                        stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+                        <path d="M3 3v5h5" />
+                    </svg>
+                </button>
+
+                <!-- Share -->
+                <button class="action-btn" id="shareBtn" title="Share" aria-label="Share this reason">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor"
+                        stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <circle cx="18" cy="5" r="3" />
+                        <circle cx="6" cy="12" r="3" />
+                        <circle cx="18" cy="19" r="3" />
+                        <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
+                        <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+                    </svg>
+                </button>
+
+                <!-- Favourite (star) -->
+                <button class="action-btn star-btn" id="favouriteCardBtn" title="Add to Favourites"
+                    aria-label="Toggle favourite" aria-pressed="false">
+                    <!-- Outline star (unfavourited) -->
+                    <svg class="star-outline" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none"
+                        stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
+                        aria-hidden="true">
+                        <polygon
+                            points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                    </svg>
+                    <!-- Filled star (favourited) -->
+                    <svg class="star-filled" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="currentColor"
+                        stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
+                        aria-hidden="true">
+                        <polygon
+                            points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                    </svg>
+                </button>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- ============================================================
+       FOOTER
+       ============================================================ -->
+    <footer class="footer" role="contentinfo">
+        <span class="footer-text">
+            Made with
+            <svg class="heart-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="#22c55e"
+                aria-label="love" role="img">
+                <path
+                    d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+            </svg>
+            by Augy
+        </span>
+    </footer>
+
+    <!-- ============================================================
+       THEME MODAL
+       ============================================================ -->
+    <div class="modal" id="themeModal" role="dialog" aria-modal="true" aria-labelledby="themeModalTitle">
+        <div class="modal-backdrop" id="themeModalBackdrop"></div>
+        <div class="modal-sheet glass">
+            <div class="modal-header">
+                <h2 class="modal-title" id="themeModalTitle">Pick a Theme</h2>
+                <button class="modal-close" id="themeModalClose" aria-label="Close theme picker">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor"
+                        stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg>
+                </button>
+            </div>
+            <div class="theme-grid" id="themeGrid">
+                <!-- Populated by app.js -->
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================
+       FAVOURITES MODAL
+       ============================================================ -->
+    <div class="modal" id="favouritesModal" role="dialog" aria-modal="true" aria-labelledby="favouritesModalTitle">
+        <div class="modal-backdrop" id="favouritesModalBackdrop"></div>
+        <div class="modal-sheet glass">
+            <div class="modal-header">
+                <h2 class="modal-title" id="favouritesModalTitle">Favourites</h2>
+                <button class="modal-close" id="favouritesModalClose" aria-label="Close favourites">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor"
+                        stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg>
+                </button>
+            </div>
+            <div class="favourites-list" id="favouritesList" role="list" aria-label="Saved favourite reasons">
+            </div>
+        </div>
+    </div>
+
 
     <script src="/script.js"></script>
 
     <script>
         if ('serviceWorker' in navigator) {
-          navigator.serviceWorker.register('/sw.js');
+            navigator.serviceWorker.register('/sw.js');
         }
     </script>
-    
+
 </body>
 
 </html>
