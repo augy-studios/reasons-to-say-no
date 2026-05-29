@@ -10,7 +10,7 @@ const ASSETS = [
   "/manifest.json"
 ];
 
-/* ---- Install: cache shell ---------------------------------- */
+/* -- Install: cache shell -- */
 
 self.addEventListener('install', event => {
   event.waitUntil(
@@ -20,7 +20,7 @@ self.addEventListener('install', event => {
   );
 });
 
-/* ---- Activate: clean old caches ---------------------------- */
+/* -- Activate: clean old caches -- */
 
 self.addEventListener('activate', event => {
   event.waitUntil(
@@ -36,7 +36,7 @@ self.addEventListener('activate', event => {
   );
 });
 
-/* ---- Fetch: strategy per route ----------------------------- */
+/* -- Fetch: strategy per route -- */
 
 self.addEventListener('fetch', event => {
   const {
@@ -44,23 +44,23 @@ self.addEventListener('fetch', event => {
   } = event;
   const url = new URL(request.url);
 
-  // API routes — always network-first (no cache)
+  // API — network-first
   if (url.pathname.startsWith('/api/')) {
     event.respondWith(networkFirst(request));
     return;
   }
 
-  // Google Fonts — cache-first (they are immutable)
+  // Google Fonts — cache-first (immutable)
   if (url.hostname === 'fonts.googleapis.com' || url.hostname === 'fonts.gstatic.com') {
     event.respondWith(cacheFirst(request));
     return;
   }
 
-  // Shell / static assets — cache-first with network update
+  // static assets — cache-first
   event.respondWith(cacheFirst(request));
 });
 
-/* ---- Strategies -------------------------------------------- */
+/* -- Strategies -- */
 
 async function networkFirst(request) {
   try {
@@ -93,7 +93,7 @@ async function cacheFirst(request) {
     }
     return response;
   } catch {
-    // No cache and offline — return a minimal fallback for navigation
+    // offline — fallback for navigation
     if (request.mode === 'navigate') {
       return caches.match('/index.html');
     }

@@ -1,6 +1,4 @@
-/* ============================================================
-   THEMES
-   ============================================================ */
+/* -- THEMES -- */
 
 const THEMES = [{
         id: 'classic',
@@ -39,23 +37,17 @@ const THEMES = [{
     },
 ];
 
-/* ============================================================
-   STORAGE KEYS
-   ============================================================ */
+/* -- STORAGE KEYS -- */
 
 const KEY_THEME = 'rtsn_theme';
 const KEY_FAVS = 'rtsn_favourites';
 
-/* ============================================================
-   STATE
-   ============================================================ */
+/* -- STATE -- */
 
 let currentReason = null; // { id, reason }
 let isLoading = false;
 
-/* ============================================================
-   DOM REFS
-   ============================================================ */
+/* -- DOM REFS -- */
 
 const xOverlay = document.getElementById('xOverlay');
 const reasonText = document.getElementById('reasonText');
@@ -77,9 +69,7 @@ const favouritesModalBackdrop = document.getElementById('favouritesModalBackdrop
 const favouritesList = document.getElementById('favouritesList');
 const favBadge = document.getElementById('favBadge');
 
-/* ============================================================
-   THEME
-   ============================================================ */
+/* -- THEME -- */
 
 function applyTheme(themeId) {
     const theme = THEMES.find(t => t.id === themeId) || THEMES[0];
@@ -133,15 +123,12 @@ function initTheme() {
     applyTheme(savedId);
 }
 
-/* ============================================================
-   FETCH REASON
-   ============================================================ */
+/* -- FETCH REASON -- */
 
 async function fetchReason() {
     if (isLoading) return;
     isLoading = true;
 
-    // Start spin & X animation immediately
     triggerRegenerateAnim();
     playXAnimation();
 
@@ -163,8 +150,7 @@ async function fetchReason() {
 
         updateFavouriteCardBtn();
 
-        // Fire-and-forget stat tracking
-        trackStat('webapp');
+        trackStat('webapp'); // fire-and-forget
 
     } catch (err) {
         console.error('[RTSN] fetchReason error:', err);
@@ -189,18 +175,15 @@ async function trackStat(platform) {
             }),
         });
     } catch {
-        // Stat tracking is non-critical; silently fail
+        // non-critical; ignore
     }
 }
 
-/* ============================================================
-   ANIMATIONS
-   ============================================================ */
+/* -- ANIMATIONS -- */
 
 function playXAnimation() {
     xOverlay.classList.remove('animate');
-    // Force reflow so re-triggering works
-    void xOverlay.offsetWidth;
+    void xOverlay.offsetWidth; // force reflow for re-trigger
     xOverlay.classList.add('animate');
 }
 
@@ -216,9 +199,7 @@ function triggerRegenerateAnim() {
     );
 }
 
-/* ============================================================
-   FAVOURITES — STORAGE
-   ============================================================ */
+/* -- FAVOURITES: STORAGE -- */
 
 function getFavourites() {
     try {
@@ -281,9 +262,7 @@ function refreshFavBadge() {
     }
 }
 
-/* ============================================================
-   FAVOURITES — MODAL RENDER
-   ============================================================ */
+/* -- FAVOURITES: RENDER -- */
 
 function renderFavourites() {
     const favs = getFavourites();
@@ -294,7 +273,6 @@ function renderFavourites() {
         return;
     }
 
-    // Build list items
     const itemsHtml = favs.map((fav, i) => `
     <div class="fav-item" role="listitem">
       <p class="fav-text">${escapeHtml(fav.reason)}</p>
@@ -327,7 +305,6 @@ function renderFavourites() {
     </div>
   `).join('');
 
-    // Clear all button
     const clearHtml = `
     <div class="fav-clear-row">
       <button class="fav-clear-btn" id="clearAllFavsBtn" aria-label="Clear all favourites">
@@ -338,7 +315,6 @@ function renderFavourites() {
 
     favouritesList.innerHTML = itemsHtml + clearHtml;
 
-    // Bind action buttons
     favouritesList.querySelectorAll('[data-action]').forEach(btn => {
         btn.addEventListener('click', () => {
             const idx = parseInt(btn.dataset.index, 10);
@@ -379,9 +355,7 @@ function clearAllFavourites() {
     showToast('All favourites cleared');
 }
 
-/* ============================================================
-   SHARE
-   ============================================================ */
+/* -- SHARE -- */
 
 function shareReason() {
     if (!currentReason) return;
@@ -397,22 +371,19 @@ function shareReason() {
             if (err.name !== 'AbortError') showToast('Share failed');
         });
     } else {
-        // Graceful fallback: copy to clipboard
+        // fallback: copy
         navigator.clipboard.writeText(currentReason.reason)
             .then(() => showToast('Reason copied to clipboard'))
             .catch(() => showToast('Share is not supported on this browser'));
     }
 }
 
-/* ============================================================
-   MODAL
-   ============================================================ */
+/* -- MODAL -- */
 
 function openModal(modal) {
     modal.classList.add('open');
     document.body.style.overflow = 'hidden';
-    // Focus the close button for accessibility
-    const closeBtn = modal.querySelector('.modal-close');
+    const closeBtn = modal.querySelector('.modal-close'); // focus for a11y
     if (closeBtn) setTimeout(() => closeBtn.focus(), 50);
 }
 
@@ -421,9 +392,7 @@ function closeModal(modal) {
     document.body.style.overflow = '';
 }
 
-/* ============================================================
-   TOAST
-   ============================================================ */
+/* -- TOAST -- */
 
 function showToast(message) {
     const toast = document.createElement('div');
@@ -431,7 +400,7 @@ function showToast(message) {
     toast.textContent = message;
     toastContainer.appendChild(toast);
 
-    // Two rAF to ensure element is painted before adding .show
+    // double rAF — ensure paint before .show
     requestAnimationFrame(() => {
         requestAnimationFrame(() => toast.classList.add('show'));
     });
@@ -442,9 +411,7 @@ function showToast(message) {
     }, 2400);
 }
 
-/* ============================================================
-   UTILS
-   ============================================================ */
+/* -- UTILS -- */
 
 function escapeHtml(str) {
     const div = document.createElement('div');
@@ -452,9 +419,7 @@ function escapeHtml(str) {
     return div.innerHTML;
 }
 
-/* ============================================================
-   EVENT LISTENERS
-   ============================================================ */
+/* -- EVENT LISTENERS -- */
 
 // Card actions
 regenerateBtn.addEventListener('click', fetchReason);
@@ -477,13 +442,12 @@ favouritesNavBtn.addEventListener('click', () => {
 favouritesModalClose.addEventListener('click', () => closeModal(favouritesModal));
 favouritesModalBackdrop.addEventListener('click', () => closeModal(favouritesModal));
 
-// Keyboard: Escape closes modals, Space regenerates
+// Escape closes modals, Space regenerates
 document.addEventListener('keydown', e => {
     if (e.key === 'Escape') {
         closeModal(themeModal);
         closeModal(favouritesModal);
     }
-    // Space to regenerate (only when no modal is open and focus isn't on a button)
     if (
         e.key === ' ' &&
         !themeModal.classList.contains('open') &&
@@ -496,9 +460,7 @@ document.addEventListener('keydown', e => {
     }
 });
 
-/* ============================================================
-   SERVICE WORKER
-   ============================================================ */
+/* -- SERVICE WORKER -- */
 
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
@@ -507,12 +469,10 @@ if ('serviceWorker' in navigator) {
     });
 }
 
-/* ============================================================
-   INIT
-   ============================================================ */
+/* -- INIT -- */
 
 (function init() {
     initTheme();
     refreshFavBadge();
-    fetchReason(); // Triggers X animation + loads first reason
+    fetchReason(); // triggers X anim + loads first reason
 })();

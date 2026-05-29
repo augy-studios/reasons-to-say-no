@@ -1,19 +1,10 @@
 * {
   font-family: "Jua", sans-serif;
 
-  /* Chrome and Opera */
   user-select: none;
-
-  /* Safari */
   -webkit-user-select: none;
-
-  /* Konqueror HTML */
   -khtml-user-select: none;
-
-  /* Firefox */
   -moz-user-select: none;
-
-  /* Internet Explorer/Edge */
   -ms-user-select: none;
 }
 
@@ -81,9 +72,7 @@
   --slow: 0.40s;
 }
 
-/* ============================================================
-   BASE
-   ============================================================ */
+/* -- BASE -- */
 
 html {
   font-family: 'Jua', sans-serif;
@@ -110,9 +99,7 @@ a {
   text-decoration: none;
 }
 
-/* ============================================================
-   X ANIMATION OVERLAY
-   ============================================================ */
+/* -- X ANIMATION OVERLAY -- */
 
 .x-overlay {
   position: fixed;
@@ -173,9 +160,7 @@ a {
   }
 }
 
-/* ============================================================
-   GLASS UTILITY
-   ============================================================ */
+/* -- GLASS UTILITY -- */
 
 .glass {
   background: var(--glass-bg);
@@ -185,9 +170,7 @@ a {
   box-shadow: var(--glass-shadow);
 }
 
-/* ============================================================
-   NAVIGATION
-   ============================================================ */
+/* -- NAVIGATION -- */
 
 .navbar {
   height: var(--nav-h);
@@ -234,7 +217,6 @@ a {
   flex-shrink: 0;
 }
 
-/* Shared pill style for nav buttons and links */
 .nav-pill {
   display: inline-flex;
   align-items: center;
@@ -276,9 +258,7 @@ a {
   flex-shrink: 0;
 }
 
-.nav-label {
-  /* Hidden on small screens via media query */
-}
+.nav-label {}
 
 /* Favourite badge */
 .fav-badge {
@@ -311,9 +291,7 @@ a {
   color: #78350f;
 }
 
-/* ============================================================
-   MAIN
-   ============================================================ */
+/* -- MAIN -- */
 
 .main {
   flex: 1;
@@ -324,9 +302,7 @@ a {
   overflow: hidden;
 }
 
-/* ============================================================
-   REASON CARD
-   ============================================================ */
+/* -- REASON CARD -- */
 
 .reason-card {
   width: 100%;
@@ -366,9 +342,7 @@ a {
   font-size: 1rem;
 }
 
-/* ============================================================
-   CARD ACTION BUTTONS
-   ============================================================ */
+/* -- CARD ACTION BUTTONS -- */
 
 .card-actions {
   display: flex;
@@ -446,9 +420,7 @@ a {
   display: block;
 }
 
-/* ============================================================
-   FOOTER
-   ============================================================ */
+/* -- FOOTER -- */
 
 .footer {
   height: var(--footer-h);
@@ -474,9 +446,7 @@ a {
   flex-shrink: 0;
 }
 
-/* ============================================================
-   MODALS
-   ============================================================ */
+/* -- MODALS -- */
 
 .modal {
   position: fixed;
@@ -559,9 +529,7 @@ a {
   color: var(--text-primary);
 }
 
-/* ============================================================
-   THEME GRID
-   ============================================================ */
+/* -- THEME GRID -- */
 
 .theme-grid {
   display: grid;
@@ -617,9 +585,7 @@ a {
   line-height: 1.35;
 }
 
-/* ============================================================
-   FAVOURITES LIST
-   ============================================================ */
+/* -- FAVOURITES LIST -- */
 
 .favourites-list {
   display: flex;
@@ -721,9 +687,7 @@ a {
   line-height: 1.65;
 }
 
-/* ============================================================
-   TOAST
-   ============================================================ */
+/* -- TOAST -- */
 
 .toast-container {
   position: fixed;
@@ -759,9 +723,7 @@ a {
   transform: translateY(0) scale(1);
 }
 
-/* ============================================================
-   SCROLLBAR
-   ============================================================ */
+/* -- SCROLLBAR -- */
 
 .modal-sheet::-webkit-scrollbar {
   width: 4px;
@@ -776,9 +738,7 @@ a {
   border-radius: 2px;
 }
 
-/* ============================================================
-   RESPONSIVE
-   ============================================================ */
+/* -- RESPONSIVE -- */
 
 @media (max-width: 600px) {
   .navbar {
