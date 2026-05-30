@@ -343,6 +343,19 @@ class RtsnBot(commands.Bot):
 
     async def on_ready(self):
         logger.info("Logged in as %s (ID: %s)", self.user, self.user.id)
+        await self._update_presence()
+
+    async def on_guild_join(self, guild: discord.Guild):
+        await self._update_presence()
+
+    async def on_guild_remove(self, guild: discord.Guild):
+        await self._update_presence()
+
+    async def _update_presence(self):
+        count = len(self.guilds)
+        await self.change_presence(
+            activity=discord.Game(name=f"saying no to {count} guild{'s' if count != 1 else ''}")
+        )
 
 
 bot = RtsnBot()
