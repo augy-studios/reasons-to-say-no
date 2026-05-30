@@ -105,11 +105,11 @@ async def cmd_start(event):
     text = (
         "👋 **Reasons to Say No**\n\n"
         "Here's what I can do:\n\n"
-        "🎲 `/no` — Get a random reason to say no\n"
-        "⭐ `/fav` — Save the last reason to your favourites\n"
-        "📋 `/myfavs` — Browse your saved favourites\n"
-        "📊 `/stats` — View cross-platform usage stats as a chart\n"
-        "ℹ️ `/about` — About this project\n\n"
+        "🎲 /no — Get a random reason to say no\n"
+        "⭐ /fav — Save the last reason to your favourites\n"
+        "📋 /myfavs — Browse your saved favourites\n"
+        "📊 /stats — View cross-platform usage stats as a chart\n"
+        "ℹ️ /about — About this project\n\n"
         "_In a group, mention me or use_ `/cmd@username` _to talk to me._"
     )
     await event.respond(
