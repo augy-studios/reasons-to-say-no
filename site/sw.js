@@ -1,10 +1,14 @@
-const CACHE = "justsayno-offline-v6";
+const CACHE = "justsayno-offline-v7";
 
 const ASSETS = [
   "/",
   "/index.html",
   "/style.css",
   "/script.js",
+  "/stats",
+  "/stats.html",
+  "/stats.css",
+  "/stats.js",
   "/RTSN-main.png",
   "/favicon.ico",
   "/manifest.json"

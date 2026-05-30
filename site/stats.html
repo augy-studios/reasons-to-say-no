@@ -20,14 +20,14 @@
     <link rel="manifest" href="/manifest.json" />
 
     <meta charset="utf-8">
-    <title>Reasons to Say No | UwU Apps</title>
+    <title>Stats for Nerds | Reasons to Say No</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="Get a compelling reason to say no, whenever you need one.">
+    <meta name="description" content="Usage statistics for Reasons to Say No across all platforms.">
 
     <meta property="og:type" content="website">
-    <meta property="og:title" content="Reasons to Say No | UwU Apps" />
+    <meta property="og:title" content="Stats for Nerds | Reasons to Say No" />
     <meta property="og:site_name" content="UwU Apps" />
-    <meta property="og:description" content="Get a compelling reason to say no, whenever you need one." />
+    <meta property="og:description" content="Usage statistics for Reasons to Say No across all platforms." />
 
     <meta name="theme-color" content="#ccffcc" id="metaThemeColour" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -36,9 +36,9 @@
 
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Jua">
     <link rel="stylesheet" href="/style.css">
+    <link rel="stylesheet" href="/stats.css">
     <meta name="theme-color" content="#ccffcc" />
 
-    <!-- Embed Image -->
     <link rel="apple-touch-icon" href="/RTSN-main.png">
     <link rel="icon" href="/favicon.ico">
     <link rel="shortcut icon" href="/favicon.ico">
@@ -51,37 +51,34 @@
 </head>
 
 <body>
-    <!-- X ANIMATION OVERLAY -->
-    <div class="x-overlay" id="xOverlay" aria-hidden="true">
-        <svg class="x-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" role="presentation">
-            <line x1="20" y1="20" x2="180" y2="180" stroke="#ef4444" stroke-width="18" stroke-linecap="round" />
-            <line x1="180" y1="20" x2="20" y2="180" stroke="#ef4444" stroke-width="18" stroke-linecap="round" />
-        </svg>
-    </div>
 
     <!-- Toast notification container -->
     <div class="toast-container" id="toastContainer" aria-live="polite" aria-atomic="true"></div>
 
     <!-- NAVIGATION -->
     <nav class="navbar" role="navigation" aria-label="Main navigation">
-        <div class="nav-brand">
+        <a href="/" class="nav-brand" style="text-decoration:none;color:inherit;" aria-label="Go to home page">
             <svg class="brand-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none"
                 aria-hidden="true">
                 <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" />
-                <line x1="8" y1="8" x2="16" y2="16" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" />
-                <line x1="16" y1="8" x2="8" y2="16" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" />
+                <line x1="8" y1="8" x2="16" y2="16" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" />
+                <line x1="16" y1="8" x2="8" y2="16" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" />
             </svg>
             <span class="nav-title">Reasons to Say No</span>
-        </div>
+        </a>
 
         <div class="nav-actions">
 
             <!-- Discord Bot -->
-            <a href="https://discord.com/oauth2/authorize?client_id=1509196842955702537" target="_blank" rel="noopener noreferrer" class="nav-pill"
-                title="Add Discord Bot" aria-label="Add Discord Bot to your server">
+            <a href="https://discord.com/oauth2/authorize?client_id=1509196842955702537" target="_blank"
+                rel="noopener noreferrer" class="nav-pill" title="Add Discord Bot"
+                aria-label="Add Discord Bot to your server">
                 <svg class="icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="currentColor"
                     aria-hidden="true">
-                    <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/>
+                    <path
+                        d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z" />
                 </svg>
                 <span class="nav-label">Discord Bot</span>
             </a>
@@ -91,7 +88,8 @@
                 title="Open Telegram Bot" aria-label="Open Telegram Bot">
                 <svg class="icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="currentColor"
                     aria-hidden="true">
-                    <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
+                    <path
+                        d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z" />
                 </svg>
                 <span class="nav-label">Telegram Bot</span>
             </a>
@@ -120,7 +118,8 @@
             </button>
 
             <!-- Theme Picker -->
-            <button class="nav-pill icon-only" id="themeNavBtn" title="Change Theme" aria-label="Open theme picker">
+            <button class="nav-pill icon-only" id="themeNavBtn" title="Change Theme"
+                aria-label="Open theme picker">
                 <svg class="icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none"
                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                     aria-hidden="true">
@@ -135,7 +134,8 @@
 
             <!-- Buy Augy a Coffee -->
             <a href="https://donate.stripe.com/28o2akeAr3hv0DK6oo" target="_blank" rel="noopener noreferrer"
-                class="nav-pill icon-only coffee-pill" title="Buy Augy a Coffee" aria-label="Buy Augy a Coffee">
+                class="nav-pill icon-only coffee-pill" title="Buy Augy a Coffee"
+                aria-label="Buy Augy a Coffee">
                 <svg class="icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none"
                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                     aria-hidden="true">
@@ -151,58 +151,59 @@
     </nav>
 
     <!-- MAIN CONTENT -->
-    <main class="main" role="main">
-        <div class="reason-card glass" id="reasonCard">
+    <main class="stats-main" role="main">
+        <div class="stats-container">
 
-            <p class="reason-eyebrow">Your reason to say no</p>
-
-            <p class="reason-text" id="reasonText" aria-live="polite" aria-label="Generated reason to say no">
-                Finding a reason for you...
-            </p>
-
-            <div class="card-actions" role="group" aria-label="Reason actions">
-
-                <!-- Regenerate -->
-                <button class="action-btn" id="regenerateBtn" title="Regenerate" aria-label="Generate a new reason">
-                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor"
-                        stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                        <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
-                        <path d="M3 3v5h5" />
-                    </svg>
-                </button>
-
-                <!-- Share -->
-                <button class="action-btn" id="shareBtn" title="Share" aria-label="Share this reason">
-                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor"
-                        stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                        <circle cx="18" cy="5" r="3" />
-                        <circle cx="6" cy="12" r="3" />
-                        <circle cx="18" cy="19" r="3" />
-                        <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
-                        <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
-                    </svg>
-                </button>
-
-                <!-- Favourite (star) -->
-                <button class="action-btn star-btn" id="favouriteCardBtn" title="Add to Favourites"
-                    aria-label="Toggle favourite" aria-pressed="false">
-                    <!-- Outline star (unfavourited) -->
-                    <svg class="star-outline" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none"
-                        stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
-                        aria-hidden="true">
-                        <polygon
-                            points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                    </svg>
-                    <!-- Filled star (favourited) -->
-                    <svg class="star-filled" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="currentColor"
-                        stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
-                        aria-hidden="true">
-                        <polygon
-                            points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                    </svg>
-                </button>
-
+            <div class="stats-header">
+                <h1 class="stats-title">Stats for Nerds</h1>
+                <p class="stats-subtitle">All-time usage across every platform</p>
             </div>
+
+            <!-- Summary cards (populated by stats.js) -->
+            <div class="stats-summary" id="statsSummary" aria-label="Usage summary">
+                <!-- Loading placeholders -->
+                <div class="stat-card glass">
+                    <span class="stat-value loading">—</span>
+                    <span class="stat-label">Total Uses</span>
+                </div>
+                <div class="stat-card glass">
+                    <span class="stat-dot" style="background:#2e7d32" aria-hidden="true"></span>
+                    <span class="stat-value loading">—</span>
+                    <span class="stat-label">Web App</span>
+                </div>
+                <div class="stat-card glass">
+                    <span class="stat-dot" style="background:#1565c0" aria-hidden="true"></span>
+                    <span class="stat-value loading">—</span>
+                    <span class="stat-label">Telegram</span>
+                </div>
+                <div class="stat-card glass">
+                    <span class="stat-dot" style="background:#6a1b9a" aria-hidden="true"></span>
+                    <span class="stat-value loading">—</span>
+                    <span class="stat-label">Discord</span>
+                </div>
+                <div class="stat-card glass">
+                    <span class="stat-dot" style="background:#00838f" aria-hidden="true"></span>
+                    <span class="stat-value loading">—</span>
+                    <span class="stat-label">API</span>
+                </div>
+            </div>
+
+            <!-- Charts (populated by stats.js) -->
+            <div class="charts-grid" id="chartsGrid">
+                <div class="chart-card glass">
+                    <h2 class="chart-title">All-time by Platform</h2>
+                    <div class="chart-wrap">
+                        <canvas id="pieChart" aria-label="All-time usage by platform" role="img"></canvas>
+                    </div>
+                </div>
+                <div class="chart-card glass">
+                    <h2 class="chart-title">Last 7 Days</h2>
+                    <div class="chart-wrap">
+                        <canvas id="barChart" aria-label="Usage over the last 7 days" role="img"></canvas>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </main>
 
@@ -236,13 +237,14 @@
                 </button>
             </div>
             <div class="theme-grid" id="themeGrid">
-                <!-- Populated by app.js -->
+                <!-- Populated by stats.js -->
             </div>
         </div>
     </div>
 
     <!-- FAVOURITES MODAL -->
-    <div class="modal" id="favouritesModal" role="dialog" aria-modal="true" aria-labelledby="favouritesModalTitle">
+    <div class="modal" id="favouritesModal" role="dialog" aria-modal="true"
+        aria-labelledby="favouritesModalTitle">
         <div class="modal-backdrop" id="favouritesModalBackdrop"></div>
         <div class="modal-sheet glass">
             <div class="modal-header">
@@ -260,8 +262,8 @@
         </div>
     </div>
 
-
-    <script src="/script.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+    <script src="/stats.js"></script>
 
     <script>
         if ('serviceWorker' in navigator) {
