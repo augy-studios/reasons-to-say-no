@@ -1,4 +1,4 @@
-# Reasons to Say No — Telegram Bot
+# Reasons to Say No - Telegram Bot
 
 import asyncio
 import io
@@ -72,7 +72,7 @@ def format_reason(reason: dict) -> str:
 async def send_reason(event):
     reason = await pg.get_random_reason()
     if not reason:
-        await event.respond("❌  Couldn't reach the database right now — try again in a moment.")
+        await event.respond("❌  Couldn't reach the database right now - try again in a moment.")
         return None
 
     msg = await event.respond(
@@ -94,11 +94,11 @@ async def cmd_start(event):
     text = (
         "**Reasons to Say No**\n\n"
         "Here's what I can do:\n\n"
-        "🎲 `/no` — Get a random reason to say no\n"
-        "⭐ `/fav` — Save the last reason to your favourites\n"
-        "📋 `/myfavs` — Browse your saved favourites\n"
-        "📊 `/stats` — View cross-platform usage stats as a chart\n"
-        "ℹ️ `/about` — About this project\n\n"
+        "🎲 `/no` - Get a random reason to say no\n"
+        "⭐ `/fav` - Save the last reason to your favourites\n"
+        "📋 `/myfavs` - Browse your saved favourites\n"
+        "📊 `/stats` - View cross-platform usage stats as a chart\n"
+        "ℹ️ `/about` - About this project\n\n"
         "_In a group, mention me or use_ `/cmd@username` _to talk to me._"
     )
     await event.respond(
@@ -145,7 +145,7 @@ async def cmd_stats(event):
 
     totals = await pg.get_total_stats()
     if totals["total"] == 0:
-        await event.respond("📊  No stats recorded yet — use /no to get started!")
+        await event.respond("📊  No stats recorded yet - use /no to get started!")
         return
 
     by_platform = await pg.get_stats_by_platform()
@@ -193,7 +193,7 @@ async def cb_new_reason(event):
     reason = await pg.get_random_reason()
     if not reason:
         try:
-            await event.answer("❌  Database error — try again!", alert=True)
+            await event.answer("❌  Database error - try again!", alert=True)
         except QueryIdInvalidError:
             pass
         return
@@ -214,7 +214,7 @@ async def cb_save_fav(event):
 
     if not row or not row.get("reason_text"):
         try:
-            await event.answer("❌  Couldn't find the reason data — please try again.", alert=True)
+            await event.answer("❌  Couldn't find the reason data - please try again.", alert=True)
         except QueryIdInvalidError:
             pass
         return
@@ -391,7 +391,7 @@ def build_stats_chart(by_platform: list[dict], by_day: list[dict], totals: dict)
                       edgecolor="#99cc99")
 
     ax_bar.set_title("Last 7 Days by Platform", color=TEXT_COLOR, fontsize=14, fontweight="bold", pad=14)
-    fig.suptitle("Reasons to Say No — Usage Stats", color=TEXT_COLOR, fontsize=15, fontweight="bold", y=1.01)
+    fig.suptitle("Reasons to Say No - Usage Stats", color=TEXT_COLOR, fontsize=15, fontweight="bold", y=1.01)
     plt.tight_layout()
 
     buf = io.BytesIO()

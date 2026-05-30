@@ -1,4 +1,4 @@
-# Supabase client — reads no_reasons, writes/reads no_stats.
+# Supabase client - reads no_reasons, writes/reads no_stats.
 
 import logging
 import random

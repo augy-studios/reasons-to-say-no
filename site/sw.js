@@ -44,19 +44,19 @@ self.addEventListener('fetch', event => {
   } = event;
   const url = new URL(request.url);
 
-  // API — network-first
+  // API - network-first
   if (url.pathname.startsWith('/api/')) {
     event.respondWith(networkFirst(request));
     return;
   }
 
-  // Google Fonts — cache-first (immutable)
+  // Google Fonts - cache-first (immutable)
   if (url.hostname === 'fonts.googleapis.com' || url.hostname === 'fonts.gstatic.com') {
     event.respondWith(cacheFirst(request));
     return;
   }
 
-  // static assets — cache-first
+  // static assets - cache-first
   event.respondWith(cacheFirst(request));
 });
 
@@ -93,7 +93,7 @@ async function cacheFirst(request) {
     }
     return response;
   } catch {
-    // offline — fallback for navigation
+    // offline - fallback for navigation
     if (request.mode === 'navigate') {
       return caches.match('/index.html');
     }

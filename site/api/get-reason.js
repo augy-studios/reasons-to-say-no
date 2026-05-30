@@ -8,7 +8,7 @@ const supabase = createClient(
 );
 
 module.exports = async (req, res) => {
-    // CORS headers — tighten origin in production if you wish
+    // CORS headers - tighten origin in production if you wish
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
 

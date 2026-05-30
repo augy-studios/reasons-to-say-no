@@ -1,7 +1,7 @@
 # Environment / secrets
 .env
 
-# Telethon session file (contains auth token — never commit)
+# Telethon session file (contains auth token - never commit)
 *.session
 *.session-journal
 

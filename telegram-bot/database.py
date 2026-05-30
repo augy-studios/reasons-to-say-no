@@ -1,4 +1,4 @@
-# Local SQLite — active button state and per-user favourites only.
+# Local SQLite - active button state and per-user favourites only.
 
 import sqlite3
 from contextlib import contextmanager

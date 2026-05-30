@@ -1,4 +1,4 @@
-# Reasons to Say No — Telegram Bot
+# Reasons to Say No - Telegram Bot
 
 A Telethon-powered bot that reads reasons and writes stats directly via the Supabase client. Supports group chats, per-user favourites, cross-platform usage statistics, and interactive inline buttons.
 
@@ -17,8 +17,8 @@ A Telethon-powered bot that reads reasons and writes stats directly via the Supa
 
 Every reason message includes:
 
-- **🔄 New Reason** — edits the message in place with a fresh reason
-- **⭐ Save** — adds the current reason to your personal favourites
+- **🔄 New Reason** - edits the message in place with a fresh reason
+- **⭐ Save** - adds the current reason to your personal favourites
 
 The **🌐 Web App** link appears only on `/start` and `/about` responses.
 
@@ -30,8 +30,8 @@ The **🌐 Web App** link appears only on `/start` and `/about` responses.
 
 | Table        | Used for                                                         |
 |--------------|------------------------------------------------------------------|
-| `no_reasons` | Read — one random row fetched per `/no` or button press          |
-| `no_stats`   | Write — one row inserted per fetch with `platform = 'telegram'`  |
+| `no_reasons` | Read - one random row fetched per `/no` or button press          |
+| `no_stats`   | Write - one row inserted per fetch with `platform = 'telegram'`  |
 
 The `/stats` chart reads all rows from `no_stats` across every platform so you can see web app vs Telegram vs Discord side by side.
 

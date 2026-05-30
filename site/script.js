@@ -334,7 +334,7 @@ function copyFavourite(index) {
     if (!fav) return;
     navigator.clipboard.writeText(fav.reason)
         .then(() => showToast('Copied to clipboard'))
-        .catch(() => showToast('Copy failed — try again'));
+        .catch(() => showToast('Copy failed - try again'));
 }
 
 function removeFavourite(index) {
@@ -400,7 +400,7 @@ function showToast(message) {
     toast.textContent = message;
     toastContainer.appendChild(toast);
 
-    // double rAF — ensure paint before .show
+    // double rAF - ensure paint before .show
     requestAnimationFrame(() => {
         requestAnimationFrame(() => toast.classList.add('show'));
     });
