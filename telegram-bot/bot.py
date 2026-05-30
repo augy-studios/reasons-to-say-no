@@ -92,7 +92,7 @@ async def cmd_start(event):
         return
 
     text = (
-        "👋 **Reasons to Say No**\n\n"
+        "**Reasons to Say No**\n\n"
         "Here's what I can do:\n\n"
         "🎲 `/no` — Get a random reason to say no\n"
         "⭐ `/fav` — Save the last reason to your favourites\n"
