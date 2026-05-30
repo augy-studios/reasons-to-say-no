@@ -313,15 +313,16 @@ async def send_favs_page(event, user_id: int, page: int, send_new: bool):
 
 # Stats chart
 
-CHART_BG    = "#1a1a2e"
-PANEL_BG    = "#16213e"
+CHART_BG    = "#ccffcc"  # PWA classic green
+PANEL_BG    = "#e8ffe8"
+TEXT_COLOR  = "#1a3a1a"
 
 PLATFORM_COLORS = {
-    "webapp":   "#6bcb77",
-    "telegram": "#4d96ff",
-    "discord":  "#c77dff",
+    "webapp":   "#2e7d32",  # deep green
+    "telegram": "#1565c0",  # deep blue
+    "discord":  "#6a1b9a",  # deep purple
 }
-FALLBACK_COLORS = ["#ff6b6b", "#ffd93d", "#ff9f43"]
+FALLBACK_COLORS = ["#c62828", "#f57f17", "#00695c"]
 
 
 def _platform_color(platform: str, idx: int) -> str:
@@ -340,17 +341,18 @@ def build_stats_chart(by_platform: list[dict], by_day: list[dict], totals: dict)
         _, _, autos = ax_pie.pie(
             sizes, labels=labels, colors=colors,
             autopct="%1.1f%%", startangle=90,
-            textprops={"color": "white", "fontsize": 11},
+            textprops={"color": TEXT_COLOR, "fontsize": 11},
             wedgeprops={"linewidth": 1.5, "edgecolor": CHART_BG},
         )
         for a in autos:
+            a.set_color("white")
             a.set_fontsize(10)
-    ax_pie.set_title("By Platform (all time)", color="white", fontsize=14, fontweight="bold", pad=14)
+    ax_pie.set_title("By Platform (all time)", color=TEXT_COLOR, fontsize=14, fontweight="bold", pad=14)
 
     ax_bar.set_facecolor(PANEL_BG)
-    ax_bar.tick_params(colors="white")
+    ax_bar.tick_params(colors=TEXT_COLOR)
     for spine in ax_bar.spines.values():
-        spine.set_edgecolor("#444")
+        spine.set_edgecolor("#99cc99")
 
     if by_day:
         day_plat: dict = defaultdict(lambda: defaultdict(int))
@@ -368,27 +370,28 @@ def build_stats_chart(by_platform: list[dict], by_day: list[dict], totals: dict)
             bars   = ax_bar.bar(
                 x + offset, vals, width,
                 label=plat.title(), color=_platform_color(plat, i),
-                alpha=0.88, edgecolor=CHART_BG, linewidth=0.8,
+                alpha=0.9, edgecolor=CHART_BG, linewidth=0.8,
             )
             for bar in bars:
                 h = bar.get_height()
                 if h:
                     ax_bar.text(
                         bar.get_x() + bar.get_width() / 2, h + 0.05,
-                        str(int(h)), ha="center", va="bottom", color="white", fontsize=8,
+                        str(int(h)), ha="center", va="bottom", color=TEXT_COLOR, fontsize=8,
                     )
 
         ax_bar.set_xticks(x)
         ax_bar.set_xticklabels(
             [d[5:] for d in all_days],  # MM-DD
-            color="white", rotation=40, ha="right",
+            color=TEXT_COLOR, rotation=40, ha="right",
         )
-        ax_bar.yaxis.set_tick_params(labelcolor="white")
-        ax_bar.set_ylabel("Requests", color="white", fontsize=11)
-        ax_bar.legend(facecolor="#0f3460", labelcolor="white", framealpha=0.8, fontsize=10)
+        ax_bar.yaxis.set_tick_params(labelcolor=TEXT_COLOR)
+        ax_bar.set_ylabel("Requests", color=TEXT_COLOR, fontsize=11)
+        ax_bar.legend(facecolor=CHART_BG, labelcolor=TEXT_COLOR, framealpha=0.8, fontsize=10,
+                      edgecolor="#99cc99")
 
-    ax_bar.set_title("Last 7 Days by Platform", color="white", fontsize=14, fontweight="bold", pad=14)
-    fig.suptitle("📊  Reasons to Say No — Usage Stats", color="white", fontsize=15, fontweight="bold", y=1.01)
+    ax_bar.set_title("Last 7 Days by Platform", color=TEXT_COLOR, fontsize=14, fontweight="bold", pad=14)
+    fig.suptitle("Reasons to Say No — Usage Stats", color=TEXT_COLOR, fontsize=15, fontweight="bold", y=1.01)
     plt.tight_layout()
 
     buf = io.BytesIO()
