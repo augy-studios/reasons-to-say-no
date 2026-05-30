@@ -60,6 +60,7 @@ logging.basicConfig(
 logger = logging.getLogger("rtsn-bot")
 
 bot = TelegramClient("bot_session", API_ID, API_HASH)
+bot.parse_mode = "md"
 db  = Database("rtsn.db")  # buttons + favourites
 pg  = PgDatabase()          # reasons + stats
 
@@ -115,12 +116,12 @@ async def cmd_start(event):
     text = (
         "**Reasons to Say No**\n\n"
         "Here's what I can do:\n\n"
-        "🎲 `/no` - Get a random reason to say no\n"
-        "⭐ `/fav` - Save the last reason to your favourites\n"
-        "📋 `/myfavs` - Browse your saved favourites\n"
-        "📊 `/stats` - View cross-platform usage stats as a chart\n"
-        "ℹ️ `/about` - About this project\n\n"
-        "_In a group, mention me or use_ `/cmd@username` _to talk to me._"
+        "🎲 /no - Get a random reason to say no\n"
+        "⭐ /fav - Save the last reason to your favourites\n"
+        "📋 /myfavs - Browse your saved favourites\n"
+        "📊 /stats - View cross-platform usage stats as a chart\n"
+        "ℹ️ /about - About this project\n\n"
+        "__In a group, mention me or use__ `/cmd@username` __to talk to me.__"
     )
     await event.respond(
         text,
