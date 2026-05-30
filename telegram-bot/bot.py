@@ -179,7 +179,8 @@ async def cmd_stats(event):
         f"Total fetches: **{totals['total']:,}**\n"
         f"🌐 Web app:   **{totals['webapp']:,}**\n"
         f"✈️ Telegram:   **{totals['telegram']:,}**\n"
-        f"🎮 Discord:    **{totals['discord']:,}**"
+        f"🎮 Discord:    **{totals['discord']:,}**\n"
+        f"🔌 API:        **{totals['api']:,}**"
     )
     await event.respond(caption, file=img)
 
@@ -343,6 +344,7 @@ PLATFORM_COLORS = {
     "webapp":   "#2e7d32",  # deep green
     "telegram": "#1565c0",  # deep blue
     "discord":  "#6a1b9a",  # deep purple
+    "api":      "#00838f",  # deep cyan
 }
 FALLBACK_COLORS = ["#c62828", "#f57f17", "#00695c"]
 

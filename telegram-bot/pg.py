@@ -112,10 +112,11 @@ class PgDatabase:
                 "webapp":   counts.get("webapp",   0),
                 "telegram": counts.get("telegram", 0),
                 "discord":  counts.get("discord",  0),
+                "api":      counts.get("api",      0),
             }
         except Exception as exc:
             logger.error("get_total_stats failed: %s", exc)
-            return {"total": 0, "webapp": 0, "telegram": 0, "discord": 0}
+            return {"total": 0, "webapp": 0, "telegram": 0, "discord": 0, "api": 0}
 
     async def close(self):
         pass  # supabase-py manages its own session

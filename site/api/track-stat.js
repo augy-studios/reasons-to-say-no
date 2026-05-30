@@ -7,7 +7,7 @@ const supabase = createClient(
     process.env.SUPABASE_SERVICE_KEY
 );
 
-const VALID_PLATFORMS = new Set(['webapp', 'telegram', 'discord']);
+const VALID_PLATFORMS = new Set(['webapp', 'telegram', 'discord', 'api']);
 
 module.exports = async (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
