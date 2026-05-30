@@ -11,6 +11,7 @@ An open project by **Augy** / [UwU Apps](https://uwuapps.org/), available as a w
 | Platform | Link |
 |----------|------|
 | 🌐 Web App | [no.uwuapps.org](https://no.uwuapps.org/) |
+| 📊 Stats | [no.uwuapps.org/stats](https://no.uwuapps.org/stats) |
 | ✈️ Telegram Bot | [@no_reasons_bot](https://t.me/no_reasons_bot) |
 | 🎮 Discord Bot | [Add to your server](https://discord.com/oauth2/authorize?client_id=1509196842955702537) |
 | 📖 API Docs | [docs.api.uwuapps.org/no](https://docs.api.uwuapps.org/no) |
@@ -20,6 +21,8 @@ An open project by **Augy** / [UwU Apps](https://uwuapps.org/), available as a w
 ## Web App
 
 A PWA at [no.uwuapps.org](https://no.uwuapps.org/) — tap to get a reason, regenerate, share, or save favourites. Supports multiple themes and works offline. Source lives in [`site/`](site/).
+
+A **Stats for Nerds** page at [no.uwuapps.org/stats](https://no.uwuapps.org/stats) shows live cross-platform usage charts: all-time platform breakdown (doughnut chart) and the last 7 days of activity (stacked bar chart), mirroring the data shown by `/stats` in the Telegram and Discord bots.
 
 ## Telegram Bot
 
