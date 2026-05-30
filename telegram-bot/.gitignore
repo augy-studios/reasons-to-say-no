@@ -1,0 +1,27 @@
+# Environment / secrets
+.env
+
+# Telethon session file (contains auth token — never commit)
+*.session
+*.session-journal
+
+# SQLite database
+*.db
+*.db-shm
+*.db-wal
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+env/
+
+# Logs
+*.log
+
+# macOS / editor noise
+.DS_Store
+.idea/
+.vscode/
