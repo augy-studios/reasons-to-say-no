@@ -4,12 +4,15 @@ import asyncio
 import io
 import logging
 import os
+import urllib.request
 from collections import defaultdict
+from pathlib import Path
 
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 from dotenv import load_dotenv
+from matplotlib import font_manager
 from telethon import Button, TelegramClient, events
 from telethon.errors import MessageNotModifiedError, QueryIdInvalidError
 
@@ -18,6 +21,24 @@ from pg import PgDatabase
 
 matplotlib.use("Agg")
 load_dotenv()
+
+# Font
+
+_JUA_PATH = Path(__file__).parent / "fonts" / "Jua-Regular.ttf"
+_JUA_URL  = "https://github.com/google/fonts/raw/main/ofl/jua/Jua-Regular.ttf"
+
+def _load_jua() -> bool:
+    try:
+        _JUA_PATH.parent.mkdir(exist_ok=True)
+        if not _JUA_PATH.exists():
+            urllib.request.urlretrieve(_JUA_URL, _JUA_PATH)
+        font_manager.fontManager.addfont(str(_JUA_PATH))
+        return True
+    except Exception as exc:
+        logging.getLogger("rtsn-bot").warning("Jua font unavailable: %s", exc)
+        return False
+
+_JUA_LOADED = _load_jua()
 
 # Config
 
@@ -330,6 +351,12 @@ def _platform_color(platform: str, idx: int) -> str:
 
 
 def build_stats_chart(by_platform: list[dict], by_day: list[dict], totals: dict) -> io.BytesIO:
+    font_ctx = {"font.family": "Jua"} if _JUA_LOADED else {}
+    with matplotlib.rc_context(font_ctx):
+        return _draw_stats_chart(by_platform, by_day, totals)
+
+
+def _draw_stats_chart(by_platform: list[dict], by_day: list[dict], totals: dict) -> io.BytesIO:
     fig, (ax_pie, ax_bar) = plt.subplots(1, 2, figsize=(13, 5))
     fig.patch.set_facecolor(CHART_BG)
 

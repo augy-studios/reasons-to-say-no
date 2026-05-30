@@ -10,6 +10,9 @@
 *.db-shm
 *.db-wal
 
+# Downloaded fonts
+fonts/
+
 # Python
 __pycache__/
 *.py[cod]
