@@ -3,6 +3,7 @@
 import logging
 import random
 from collections import Counter, defaultdict
+from datetime import datetime, timedelta, timezone
 
 from supabase import AsyncClient, create_async_client
 
@@ -78,11 +79,13 @@ class PgDatabase:
             logger.error("get_stats_by_platform failed: %s", exc)
             return []
 
-    async def get_stats_by_day(self) -> list[dict]:
+    async def get_stats_by_day(self, days: int = 7) -> list[dict]:
         try:
+            since = (datetime.now(timezone.utc) - timedelta(days=days)).isoformat()
             res = (
                 await self._client.table("no_stats")
                 .select("platform, created_at")
+                .gte("created_at", since)
                 .execute()
             )
 

@@ -171,7 +171,7 @@ async def cmd_stats(event):
         return
 
     by_platform = await pg.get_stats_by_platform()
-    by_day      = await pg.get_stats_by_day()
+    by_day      = await pg.get_stats_by_day(7)
     img = build_stats_chart(by_platform, by_day, totals)
 
     caption = (
@@ -392,7 +392,7 @@ def _draw_stats_chart(by_platform: list[dict], by_day: list[dict], totals: dict)
         all_days  = sorted(day_plat)
         platforms = sorted({row["platform"] for row in by_day})
         x         = np.arange(len(all_days))
-        width     = 0.8 / max(len(platforms), 1)
+        width     = 0.4 / max(len(platforms), 1)
 
         for i, plat in enumerate(platforms):
             vals   = [day_plat[d][plat] for d in all_days]
@@ -420,7 +420,7 @@ def _draw_stats_chart(by_platform: list[dict], by_day: list[dict], totals: dict)
         ax_bar.legend(facecolor=CHART_BG, labelcolor=TEXT_COLOR, framealpha=0.8, fontsize=10,
                       edgecolor="#99cc99")
 
-    ax_bar.set_title("By Day (all time)", color=TEXT_COLOR, fontsize=14, fontweight="bold", pad=14)
+    ax_bar.set_title("Last 7 Days by Platform", color=TEXT_COLOR, fontsize=14, fontweight="bold", pad=14)
     fig.suptitle("Reasons to Say No - Usage Stats", color=TEXT_COLOR, fontsize=15, fontweight="bold", y=1.01)
     plt.tight_layout()
 
