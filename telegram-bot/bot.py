@@ -1,7 +1,4 @@
-"""
-Reasons to Say No — Telegram Bot
-Reads reasons and writes stats directly via the Supabase client.
-"""
+# Reasons to Say No — Telegram Bot
 
 import asyncio
 import io
@@ -22,13 +19,13 @@ from pg import PgDatabase
 matplotlib.use("Agg")
 load_dotenv()
 
-# ── Config ────────────────────────────────────────────────────────────────────
+# Config
 
-API_ID          = int(os.environ["API_ID"])
-API_HASH        = os.environ["API_HASH"]
-BOT_TOKEN       = os.environ["BOT_TOKEN"]
-SUPABASE_URL    = os.environ["SUPABASE_URL"]
-SUPABASE_KEY    = os.environ["SUPABASE_SERVICE_KEY"]
+API_ID       = int(os.environ["API_ID"])
+API_HASH     = os.environ["API_HASH"]
+BOT_TOKEN    = os.environ["BOT_TOKEN"]
+SUPABASE_URL = os.environ["SUPABASE_URL"]
+SUPABASE_KEY = os.environ["SUPABASE_SERVICE_KEY"]
 
 WEBAPP_URL   = "https://no.uwuapps.org/"
 API_DOCS_URL = "https://docs.api.uwuapps.org/no"
@@ -41,20 +38,17 @@ logging.basicConfig(
 )
 logger = logging.getLogger("rtsn-bot")
 
-bot    = TelegramClient("bot_session", API_ID, API_HASH)
-db     = Database("rtsn.db")   # local SQLite — buttons + favourites
-pg     = PgDatabase()           # Supabase — reasons + stats
+bot = TelegramClient("bot_session", API_ID, API_HASH)
+db  = Database("rtsn.db")  # buttons + favourites
+pg  = PgDatabase()          # reasons + stats
 
-BOT_USERNAME: str = ""          # resolved in main()
+BOT_USERNAME: str = ""
 
 
-# ── Helpers ───────────────────────────────────────────────────────────────────
+# Helpers
 
 def is_for_bot(raw_text: str) -> bool:
-    """
-    Accept bare /cmd or /cmd@ourbotusername.
-    Silently skip /cmd@someotherbot so group chats work correctly.
-    """
+    # Accept /cmd or /cmd@ourbotusername; ignore /cmd@otherbot in groups.
     at_pos = raw_text.find("@")
     if at_pos == -1:
         return True
@@ -73,10 +67,9 @@ def format_reason(reason: dict) -> str:
     return f"**Reason to say no:**\n\n__{reason['reason']}__"
 
 
-# ── Shared reason sender ──────────────────────────────────────────────────────
+# Reason sender
 
 async def send_reason(event):
-    """Fetch a reason from Supabase, send it, and record the stat."""
     reason = await pg.get_random_reason()
     if not reason:
         await event.respond("❌  Couldn't reach the database right now — try again in a moment.")
@@ -86,16 +79,12 @@ async def send_reason(event):
         format_reason(reason),
         buttons=reason_buttons(reason["id"]),
     )
-
-    db.upsert_active_button(
-        msg.id, event.chat_id, event.sender_id,
-        reason["id"], reason["reason"],
-    )
+    db.upsert_active_button(msg.id, event.chat_id, event.sender_id, reason["id"], reason["reason"])
     asyncio.create_task(pg.log_stat("telegram"))
     return msg
 
 
-# ── Command handlers ──────────────────────────────────────────────────────────
+# Commands
 
 @bot.on(events.NewMessage(pattern=r"^/start(?:@\w+)?$"))
 async def cmd_start(event):
@@ -105,21 +94,16 @@ async def cmd_start(event):
     text = (
         "👋 **Reasons to Say No**\n\n"
         "Here's what I can do:\n\n"
-        "🎲 /no — Get a random reason to say no\n"
-        "⭐ /fav — Save the last reason to your favourites\n"
-        "📋 /myfavs — Browse your saved favourites\n"
-        "📊 /stats — View cross-platform usage stats as a chart\n"
-        "ℹ️ /about — About this project\n\n"
+        "🎲 `/no` — Get a random reason to say no\n"
+        "⭐ `/fav` — Save the last reason to your favourites\n"
+        "📋 `/myfavs` — Browse your saved favourites\n"
+        "📊 `/stats` — View cross-platform usage stats as a chart\n"
+        "ℹ️ `/about` — About this project\n\n"
         "_In a group, mention me or use_ `/cmd@username` _to talk to me._"
     )
     await event.respond(
         text,
-        buttons=[
-            [
-                Button.url("📖  API Docs", API_DOCS_URL),
-                Button.url("🌐  Web App",  WEBAPP_URL),
-            ]
-        ],
+        buttons=[[Button.url("📖  API Docs", API_DOCS_URL), Button.url("🌐  Web App", WEBAPP_URL)]],
     )
 
 
@@ -159,14 +143,13 @@ async def cmd_stats(event):
     if not is_for_bot(event.raw_text):
         return
 
-    totals   = await pg.get_total_stats()
+    totals = await pg.get_total_stats()
     if totals["total"] == 0:
         await event.respond("📊  No stats recorded yet — use /no to get started!")
         return
 
     by_platform = await pg.get_stats_by_platform()
     by_day      = await pg.get_stats_by_day(7)
-
     img = build_stats_chart(by_platform, by_day, totals)
 
     caption = (
@@ -194,16 +177,11 @@ async def cmd_about(event):
     )
     await event.respond(
         text,
-        buttons=[
-            [
-                Button.url("📖  API Docs", API_DOCS_URL),
-                Button.url("🌐  Web App",  WEBAPP_URL),
-            ]
-        ],
+        buttons=[[Button.url("📖  API Docs", API_DOCS_URL), Button.url("🌐  Web App", WEBAPP_URL)]],
     )
 
 
-# ── Callback (inline button) handlers ────────────────────────────────────────
+# Callbacks
 
 @bot.on(events.CallbackQuery(pattern=rb"^nr:(\d+)$"))
 async def cb_new_reason(event):
@@ -221,17 +199,11 @@ async def cb_new_reason(event):
         return
 
     try:
-        await event.edit(
-            format_reason(reason),
-            buttons=reason_buttons(reason["id"]),
-        )
+        await event.edit(format_reason(reason), buttons=reason_buttons(reason["id"]))
     except MessageNotModifiedError:
         pass
 
-    db.upsert_active_button(
-        event.message_id, event.chat_id, event.sender_id,
-        reason["id"], reason["reason"],
-    )
+    db.upsert_active_button(event.message_id, event.chat_id, event.sender_id, reason["id"], reason["reason"])
     asyncio.create_task(pg.log_stat("telegram"))
 
 
@@ -289,7 +261,7 @@ async def cb_unfav(event):
     await send_favs_page(event, event.sender_id, page=page, send_new=False)
 
 
-# ── Favourites pager ──────────────────────────────────────────────────────────
+# Favourites pager
 
 async def send_favs_page(event, user_id: int, page: int, send_new: bool):
     total  = db.count_favourites(user_id)
@@ -320,9 +292,7 @@ async def send_favs_page(event, user_id: int, page: int, send_new: bool):
 
     for fav in favs:
         short = fav["reason_text"][:35] + ("…" if len(fav["reason_text"]) > 35 else "")
-        buttons.append([
-            Button.inline(f"🗑️  {short}", data=f"unfav:{fav['reason_id']}:{page}")
-        ])
+        buttons.append([Button.inline(f"🗑️  {short}", data=f"unfav:{fav['reason_id']}:{page}")])
 
     nav_row = []
     if page > 0:
@@ -341,15 +311,15 @@ async def send_favs_page(event, user_id: int, page: int, send_new: bool):
             pass
 
 
-# ── Stats chart ───────────────────────────────────────────────────────────────
+# Stats chart
 
 CHART_BG    = "#1a1a2e"
 PANEL_BG    = "#16213e"
 
 PLATFORM_COLORS = {
-    "webapp":   "#6bcb77",   # green
-    "telegram": "#4d96ff",   # blue
-    "discord":  "#c77dff",   # purple
+    "webapp":   "#6bcb77",
+    "telegram": "#4d96ff",
+    "discord":  "#c77dff",
 }
 FALLBACK_COLORS = ["#ff6b6b", "#ffd93d", "#ff9f43"]
 
@@ -362,13 +332,12 @@ def build_stats_chart(by_platform: list[dict], by_day: list[dict], totals: dict)
     fig, (ax_pie, ax_bar) = plt.subplots(1, 2, figsize=(13, 5))
     fig.patch.set_facecolor(CHART_BG)
 
-    # ── Pie: by platform (all time) ───────────────────────────────────────────
     ax_pie.set_facecolor(PANEL_BG)
     if by_platform:
         labels = [r["platform"].title() for r in by_platform]
         sizes  = [r["count"] for r in by_platform]
         colors = [_platform_color(r["platform"], i) for i, r in enumerate(by_platform)]
-        _, texts, autos = ax_pie.pie(
+        _, _, autos = ax_pie.pie(
             sizes, labels=labels, colors=colors,
             autopct="%1.1f%%", startangle=90,
             textprops={"color": "white", "fontsize": 11},
@@ -376,10 +345,8 @@ def build_stats_chart(by_platform: list[dict], by_day: list[dict], totals: dict)
         )
         for a in autos:
             a.set_fontsize(10)
-    ax_pie.set_title("By Platform (all time)", color="white", fontsize=14,
-                     fontweight="bold", pad=14)
+    ax_pie.set_title("By Platform (all time)", color="white", fontsize=14, fontweight="bold", pad=14)
 
-    # ── Bar: last 7 days per platform ─────────────────────────────────────────
     ax_bar.set_facecolor(PANEL_BG)
     ax_bar.tick_params(colors="white")
     for spine in ax_bar.spines.values():
@@ -400,8 +367,7 @@ def build_stats_chart(by_platform: list[dict], by_day: list[dict], totals: dict)
             offset = (i - len(platforms) / 2 + 0.5) * width
             bars   = ax_bar.bar(
                 x + offset, vals, width,
-                label=plat.title(),
-                color=_platform_color(plat, i),
+                label=plat.title(), color=_platform_color(plat, i),
                 alpha=0.88, edgecolor=CHART_BG, linewidth=0.8,
             )
             for bar in bars:
@@ -409,36 +375,30 @@ def build_stats_chart(by_platform: list[dict], by_day: list[dict], totals: dict)
                 if h:
                     ax_bar.text(
                         bar.get_x() + bar.get_width() / 2, h + 0.05,
-                        str(int(h)), ha="center", va="bottom",
-                        color="white", fontsize=8,
+                        str(int(h)), ha="center", va="bottom", color="white", fontsize=8,
                     )
 
         ax_bar.set_xticks(x)
         ax_bar.set_xticklabels(
-            [d[5:] for d in all_days],   # strip year → MM-DD
+            [d[5:] for d in all_days],  # MM-DD
             color="white", rotation=40, ha="right",
         )
         ax_bar.yaxis.set_tick_params(labelcolor="white")
         ax_bar.set_ylabel("Requests", color="white", fontsize=11)
-        ax_bar.legend(facecolor="#0f3460", labelcolor="white",
-                      framealpha=0.8, fontsize=10)
+        ax_bar.legend(facecolor="#0f3460", labelcolor="white", framealpha=0.8, fontsize=10)
 
-    ax_bar.set_title("Last 7 Days by Platform", color="white", fontsize=14,
-                     fontweight="bold", pad=14)
-
-    fig.suptitle("📊  Reasons to Say No — Usage Stats",
-                 color="white", fontsize=15, fontweight="bold", y=1.01)
+    ax_bar.set_title("Last 7 Days by Platform", color="white", fontsize=14, fontweight="bold", pad=14)
+    fig.suptitle("📊  Reasons to Say No — Usage Stats", color="white", fontsize=15, fontweight="bold", y=1.01)
     plt.tight_layout()
 
     buf = io.BytesIO()
-    plt.savefig(buf, format="png", dpi=130, bbox_inches="tight",
-                facecolor=fig.get_facecolor())
+    plt.savefig(buf, format="png", dpi=130, bbox_inches="tight", facecolor=fig.get_facecolor())
     plt.close(fig)
     buf.seek(0)
     return buf
 
 
-# ── Entry point ───────────────────────────────────────────────────────────────
+# Entry point
 
 async def main():
     global BOT_USERNAME

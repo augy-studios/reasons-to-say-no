@@ -1,8 +1,4 @@
-"""
-Local SQLite database.
-Stores active inline-button state and per-user favourites only.
-Stats live in Supabase (see pg.py).
-"""
+# Local SQLite — active button state and per-user favourites only.
 
 import sqlite3
 from contextlib import contextmanager
@@ -53,7 +49,7 @@ class Database:
                 );
             """)
 
-    # ── Active Buttons ───────────────────────────────────────────────────────
+    # Active Buttons
 
     def upsert_active_button(self, message_id: int, chat_id: int,
                               user_id: int, reason_id: int, reason_text: str):
@@ -94,7 +90,7 @@ class Database:
                 (message_id, chat_id),
             )
 
-    # ── Favourites ───────────────────────────────────────────────────────────
+    # Favourites
 
     def save_favourite(self, user_id: int, reason_id: int, reason_text: str) -> bool:
         with self._conn() as conn:
