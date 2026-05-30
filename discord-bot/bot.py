@@ -334,11 +334,10 @@ intents = discord.Intents.default()
 class RtsnBot(commands.Bot):
     def __init__(self):
         super().__init__(command_prefix=commands.when_mentioned, intents=intents)
-        self._reason_view = PersistentReasonView()
 
     async def setup_hook(self):
         await pg.connect(SUPABASE_URL, SUPABASE_KEY)
-        self.add_view(self._reason_view)
+        self.add_view(PersistentReasonView())  # register persistent handler inside the event loop
         await self.tree.sync()
         logger.info("Slash commands synced")
 
