@@ -392,6 +392,7 @@ def build_stats_chart(by_platform: list[dict], by_day: list[dict], totals: dict)
     plt.tight_layout()
 
     buf = io.BytesIO()
+    buf.name = "rtsn-stats.png"
     plt.savefig(buf, format="png", dpi=130, bbox_inches="tight", facecolor=fig.get_facecolor())
     plt.close(fig)
     buf.seek(0)
