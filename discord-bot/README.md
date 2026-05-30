@@ -17,8 +17,8 @@ A discord.py bot that reads reasons and writes stats directly via the Supabase c
 
 Every single `/no` response includes:
 
-- **🔄 Regenerate** — replaces the reason in-place with a fresh one
-- **⭐ Add to Fav** — saves the current reason to your personal favourites
+- **🔄 Regenerate** - replaces the reason in-place with a fresh one
+- **⭐ Add to Fav** - saves the current reason to your personal favourites
 
 ---
 
@@ -28,8 +28,8 @@ Every single `/no` response includes:
 
 | Table | Used for |
 |-------|----------|
-| `no_reasons` | Read — one random row fetched per `/no` or button press |
-| `no_stats` | Write — one row inserted per fetch with `platform = 'discord'` |
+| `no_reasons` | Read - one random row fetched per `/no` or button press |
+| `no_stats` | Write - one row inserted per fetch with `platform = 'discord'` |
 
 ### Local SQLite (`rtsn.db`)
 

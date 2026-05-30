@@ -175,7 +175,7 @@ def _draw_stats_chart(by_platform: list[dict], by_day: list[dict], totals: dict)
         )
 
     ax_bar.set_title("Last 7 Days by Platform", color=TEXT_COLOR, fontsize=14, fontweight="bold", pad=14)
-    fig.suptitle("Reasons to Say No — Usage Stats", color=TEXT_COLOR, fontsize=15, fontweight="bold", y=1.01)
+    fig.suptitle("Reasons to Say No - Usage Stats", color=TEXT_COLOR, fontsize=15, fontweight="bold", y=1.01)
     plt.tight_layout()
 
     buf = io.BytesIO()
@@ -205,7 +205,7 @@ class PersistentReasonView(discord.ui.View):
         reason = await pg.get_random_reason()
         if not reason:
             await interaction.followup.send(
-                "❌ Couldn't reach the database right now — try again in a moment.",
+                "❌ Couldn't reach the database right now - try again in a moment.",
                 ephemeral=True,
             )
             return
@@ -229,7 +229,7 @@ class PersistentReasonView(discord.ui.View):
         row = db.get_active_button(interaction.message.id, channel_id)
         if not row:
             await interaction.response.send_message(
-                "❌ Couldn't find the reason data — try `/no` again.", ephemeral=True
+                "❌ Couldn't find the reason data - try `/no` again.", ephemeral=True
             )
             return
 
@@ -380,7 +380,7 @@ async def cmd_no(
         reasons = await pg.get_random_reasons(count)
         if not reasons:
             await interaction.followup.send(
-                "❌ Couldn't reach the database right now — try again in a moment."
+                "❌ Couldn't reach the database right now - try again in a moment."
             )
             return
         embed = make_reasons_embed(reasons)
@@ -392,7 +392,7 @@ async def cmd_no(
     reason = await pg.get_random_reason()
     if not reason:
         await interaction.followup.send(
-            "❌ Couldn't reach the database right now — try again in a moment."
+            "❌ Couldn't reach the database right now - try again in a moment."
         )
         return
 
@@ -424,7 +424,7 @@ async def cmd_stats(interaction: discord.Interaction):
     totals = await pg.get_total_stats()
     if totals["total"] == 0:
         await interaction.followup.send(
-            "📊 No stats recorded yet — use `/no` to get started!"
+            "📊 No stats recorded yet - use `/no` to get started!"
         )
         return
 
@@ -459,12 +459,12 @@ async def cmd_help(interaction: discord.Interaction):
             f"fetched live on every request.\n\n"
             f"📖 The API is free and open for anyone to use.\n\n"
             f"**Commands**\n"
-            f"🎲 `/no` — Get a random reason to say no\n"
-            f"👤 `/no mention:@user` — Ping someone with a reason\n"
-            f"🔢 `/no count:5` — Get multiple reasons at once (max 20)\n"
-            f"⭐ `/myfavs` — Browse and manage your saved favourites\n"
-            f"📊 `/stats` — Cross-platform usage chart\n"
-            f"❓ `/help` — Show this message"
+            f"🎲 `/no` - Get a random reason to say no\n"
+            f"👤 `/no mention:@user` - Ping someone with a reason\n"
+            f"🔢 `/no count:5` - Get multiple reasons at once (max 20)\n"
+            f"⭐ `/myfavs` - Browse and manage your saved favourites\n"
+            f"📊 `/stats` - Cross-platform usage chart\n"
+            f"❓ `/help` - Show this message"
         ),
         color=EMBED_COLOR,
     )
