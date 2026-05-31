@@ -209,17 +209,26 @@ async def cmd_about(event):
 @bot.on(events.InlineQuery())
 async def inline_handler(event):
     reason = await pg.get_random_reason()
-    if not reason:
-        await event.answer([])
-        return
+    results = []
 
-    result = event.builder.article(
-        title="Random Reason to Say No",
-        description=reason["reason"],
-        text=f"__{reason['reason']}__",
-    )
-    await event.answer([result], cache_time=0)
-    asyncio.create_task(pg.log_stat("telegram"))
+    if reason:
+        results.append(event.builder.article(
+            title="🎲 Random Reason",
+            description=reason["reason"],
+            text=f"__{reason['reason']}__",
+        ))
+
+    favs = db.get_favourites(event.sender_id, limit=50, offset=0)
+    for fav in favs:
+        results.append(event.builder.article(
+            title=f"⭐ {fav['reason_text'][:60]}{'…' if len(fav['reason_text']) > 60 else ''}",
+            description=fav["reason_text"],
+            text=f"__{fav['reason_text']}__",
+        ))
+
+    await event.answer(results, cache_time=0)
+    if reason:
+        asyncio.create_task(pg.log_stat("telegram"))
 
 
 # Callbacks
