@@ -219,9 +219,9 @@ async def inline_handler(event):
         ))
 
     favs = db.get_favourites(event.sender_id, limit=50, offset=0)
-    for fav in favs:
+    for i, fav in enumerate(favs, start=1):
         results.append(event.builder.article(
-            title=f"⭐ {fav['reason_text'][:60]}{'…' if len(fav['reason_text']) > 60 else ''}",
+            title=f"⭐ Favourited Reason {i}",
             description=fav["reason_text"],
             text=f"__{fav['reason_text']}__",
         ))
