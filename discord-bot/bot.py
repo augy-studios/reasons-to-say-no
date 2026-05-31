@@ -340,7 +340,7 @@ class RtsnBot(commands.Bot):
         self.add_view(PersistentReasonView())  # register persistent handler inside the event loop
         # Allow user-install so commands work in DMs between others and any server
         self.tree.allowed_installs = app_commands.AppInstallationType(guild=True, user=True)
-        self.tree.allowed_contexts = app_commands.AppCommandContext(guild=True, bot_dm=True, private_channel=True)
+        self.tree.allowed_contexts = app_commands.AppCommandContext(guild=True, dm_channel=True, private_channel=True)
         await self.tree.sync()
         logger.info("Slash commands synced")
 
