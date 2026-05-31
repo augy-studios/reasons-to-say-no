@@ -364,17 +364,94 @@ class RtsnBot(commands.Bot):
 bot = RtsnBot()
 
 
+# ── Multi-reason view ─────────────────────────────────────────────────────────
+
+class MultiReasonView(discord.ui.View):
+    def __init__(self, count: int, reasons: list[dict]):
+        super().__init__(timeout=600)
+        self.count = count
+        self.reasons = reasons
+        self._build_buttons()
+
+    def _build_buttons(self):
+        self.clear_items()
+        for i, reason in enumerate(self.reasons):
+            self.add_item(_SaveNumberedButton(
+                number=i + 1,
+                reason_id=reason["id"],
+                reason_text=reason["reason"],
+                row=i // 5,
+            ))
+        # Regen and Hide share the row immediately after the last save button
+        ctrl_row = len(self.reasons) // 5
+        self.add_item(_RegenMultiButton(row=ctrl_row))
+        self.add_item(_HideAllButton(row=ctrl_row))
+
+
+class _SaveNumberedButton(discord.ui.Button):
+    def __init__(self, number: int, reason_id: int, reason_text: str, row: int):
+        super().__init__(
+            label=f"⭐ Save {number}",
+            style=discord.ButtonStyle.primary,
+            row=row,
+        )
+        self.number      = number
+        self.reason_id   = reason_id
+        self.reason_text = reason_text
+
+    async def callback(self, interaction: discord.Interaction):
+        saved = db.save_favourite(interaction.user.id, self.reason_id, self.reason_text)
+        msg = (
+            f"⭐ Saved reason **#{self.number}** to your favourites!"
+            if saved else
+            f"Reason **#{self.number}** is already in your favourites!"
+        )
+        await interaction.response.send_message(msg, ephemeral=True)
+
+
+class _RegenMultiButton(discord.ui.Button):
+    def __init__(self, row: int):
+        super().__init__(label="🔄 Regenerate", style=discord.ButtonStyle.secondary, row=row)
+
+    async def callback(self, interaction: discord.Interaction):
+        await interaction.response.defer()
+        view: MultiReasonView = self.view  # type: ignore[assignment]
+        reasons = await pg.get_random_reasons(view.count)
+        if not reasons:
+            await interaction.followup.send(
+                "❌ Couldn't reach the database right now - try again in a moment.",
+                ephemeral=True,
+            )
+            return
+        view.reasons = reasons
+        view._build_buttons()
+        embed = make_reasons_embed(reasons)
+        await interaction.edit_original_response(embed=embed, view=view)
+        for _ in reasons:
+            asyncio.create_task(pg.log_stat("discord"))
+
+
+class _HideAllButton(discord.ui.Button):
+    def __init__(self, row: int):
+        super().__init__(label="🙈 Hide All Buttons", style=discord.ButtonStyle.danger, row=row)
+
+    async def callback(self, interaction: discord.Interaction):
+        await interaction.response.defer()
+        await interaction.edit_original_response(view=None)
+        self.view.stop()
+
+
 # ── /no ───────────────────────────────────────────────────────────────────────
 
 @bot.tree.command(name="no", description="Get a random reason to say no")
 @app_commands.describe(
     mention="Ping a user along with the reason",
-    count="Number of reasons to get at once (max 20)",
+    count="Number of reasons to get at once (max 23)",
 )
 async def cmd_no(
     interaction: discord.Interaction,
     mention: discord.User | None = None,
-    count: app_commands.Range[int, 1, 20] | None = None,
+    count: app_commands.Range[int, 1, 23] | None = None,
 ):
     await interaction.response.defer()
     content = mention.mention if mention else None
@@ -387,7 +464,8 @@ async def cmd_no(
             )
             return
         embed = make_reasons_embed(reasons)
-        await interaction.followup.send(content=content, embed=embed)
+        view  = MultiReasonView(count, reasons)
+        await interaction.followup.send(content=content, embed=embed, view=view)
         for _ in reasons:
             asyncio.create_task(pg.log_stat("discord"))
         return
@@ -464,7 +542,7 @@ async def cmd_help(interaction: discord.Interaction):
             f"**Commands**\n"
             f"🎲 `/no` - Get a random reason to say no\n"
             f"👤 `/no mention:@user` - Ping someone with a reason\n"
-            f"🔢 `/no count:5` - Get multiple reasons at once (max 20)\n"
+            f"🔢 `/no count:5` - Get multiple reasons at once (max 23)\n"
             f"⭐ `/myfavs` - Browse and manage your saved favourites\n"
             f"📊 `/stats` - Cross-platform usage chart\n"
             f"❓ `/help` - Show this message"
