@@ -338,6 +338,9 @@ class RtsnBot(commands.Bot):
     async def setup_hook(self):
         await pg.connect(SUPABASE_URL, SUPABASE_KEY)
         self.add_view(PersistentReasonView())  # register persistent handler inside the event loop
+        # Allow user-install so commands work in DMs between others and any server
+        self.tree.allowed_installs = app_commands.AppInstallationType(guild=True, user=True)
+        self.tree.allowed_contexts = app_commands.AppCommandContext(guild=True, bot_dm=True, private_channel=True)
         await self.tree.sync()
         logger.info("Slash commands synced")
 
