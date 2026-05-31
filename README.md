@@ -28,6 +28,8 @@ A **Stats for Nerds** page at [no.uwuapps.org/stats](https://no.uwuapps.org/stat
 
 [@no_reasons_bot](https://t.me/no_reasons_bot) - send `/no` to get a reason, `/myfavs` to browse saved favourites, `/stats` for cross-platform usage charts, and `/help` for the full command list.
 
+Inline mode is also supported: type `@no_reasons_bot` followed by a space in any chat to get a random reason or one of your saved favourites without leaving the conversation.
+
 ## Discord Bot
 
 [Add the bot to your server](https://discord.com/oauth2/authorize?client_id=1509196842955702537) and use slash commands:

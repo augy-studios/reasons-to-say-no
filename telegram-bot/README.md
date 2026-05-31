@@ -24,6 +24,17 @@ The **🌐 Web App** link appears only on `/start` and `/about` responses.
 
 ---
 
+## Inline mode
+
+The bot supports Telegram inline mode. Type `@no_reasons_bot` followed by a space in any chat to get results without leaving the conversation:
+
+- **🎲 Random Reason** - a fresh random reason fetched from the database
+- **⭐ Favourited Reason 1, 2, …** - your saved favourites (up to 50), listed in order
+
+Tap any result to send it as a plain message in the current chat. Stats are logged for the random reason result only.
+
+---
+
 ## Data storage
 
 ### Supabase (shared with the web app and Discord bot)
