@@ -204,6 +204,26 @@ async def cmd_about(event):
     )
 
 
+# Inline queries
+
+@bot.on(events.InlineQuery())
+async def inline_handler(event):
+    reason = await pg.get_random_reason()
+    if not reason:
+        await event.answer([])
+        return
+
+    text = format_reason(reason)
+    result = event.builder.article(
+        title="Random Reason to Say No",
+        description=reason["reason"],
+        text=text,
+        buttons=[Button.url("🌐  More Reasons", WEBAPP_URL)],
+    )
+    await event.answer([result], cache_time=0)
+    asyncio.create_task(pg.log_stat("telegram"))
+
+
 # Callbacks
 
 @bot.on(events.CallbackQuery(pattern=rb"^nr:(\d+)$"))
