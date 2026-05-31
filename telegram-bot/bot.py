@@ -213,12 +213,10 @@ async def inline_handler(event):
         await event.answer([])
         return
 
-    text = format_reason(reason)
     result = event.builder.article(
         title="Random Reason to Say No",
         description=reason["reason"],
-        text=text,
-        buttons=[Button.url("🌐  More Reasons", WEBAPP_URL)],
+        text=f"__{reason['reason']}__",
     )
     await event.answer([result], cache_time=0)
     asyncio.create_task(pg.log_stat("telegram"))
