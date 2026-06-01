@@ -40,6 +40,8 @@ Inline mode is also supported: type `@no_reasons_bot` followed by a space in any
 | `/no mention:@user` | Ping someone with a reason |
 | `/no count:5` | Get up to 20 reasons at once |
 | `/myfavs` | Browse and manage your saved favourites |
+| `/pickfav` | Pick a saved favourite to send as a public message |
+| `/pickfav mention:@user` | Pick a saved favourite and ping someone with it |
 | `/stats` | Cross-platform usage chart |
 | `/help` | About the project and full command list |
 

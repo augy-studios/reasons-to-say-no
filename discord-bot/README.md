@@ -12,6 +12,8 @@ A discord.py bot that reads reasons and writes stats directly via the Supabase c
 | `/no mention:@user` | Ping someone with a reason |
 | `/no count:5` | Get up to 20 reasons in a numbered list |
 | `/myfavs` | Browse and manage your saved favourites |
+| `/pickfav` | Pick one of your saved favourites to send as a public message |
+| `/pickfav mention:@user` | Pick a saved favourite and ping someone with it |
 | `/stats` | Cross-platform usage chart (web + Telegram + Discord + API) |
 | `/help` | About the project and full command list |
 

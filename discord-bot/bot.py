@@ -496,6 +496,117 @@ async def cmd_myfavs(interaction: discord.Interaction):
     await interaction.followup.send(embed=embed, view=view)
 
 
+# ── /pickfav ──────────────────────────────────────────────────────────────────
+
+def build_pickfav_page(
+    user_id: int, page: int, mention: discord.User | None
+) -> tuple[discord.Embed, discord.ui.View | None]:
+    total  = db.count_favourites(user_id)
+    offset = page * FAVS_PAGE_SIZE
+    favs   = db.get_favourites(user_id, limit=FAVS_PAGE_SIZE, offset=offset)
+
+    if not favs and page == 0:
+        embed = discord.Embed(
+            title="📋 Pick a Favourite",
+            description=(
+                "You have no saved favourites yet.\n\n"
+                "Use `/no` to get a reason, then tap **⭐ Add to Fav** to save it."
+            ),
+            color=EMBED_COLOR,
+        )
+        return embed, None
+
+    total_pages = max(1, (total + FAVS_PAGE_SIZE - 1) // FAVS_PAGE_SIZE)
+    lines = [f"**{offset + i + 1}.** *{fav['reason_text']}*" for i, fav in enumerate(favs)]
+    ping_note = f" · will ping {mention.display_name}" if mention else ""
+    embed = discord.Embed(
+        title=f"📋 Pick a Favourite{ping_note}",
+        description="\n\n".join(lines),
+        color=EMBED_COLOR,
+    )
+    embed.set_footer(text=f"Page {page + 1} / {total_pages}  ·  Tap a reason to send it")
+    return embed, PickFavView(user_id, page, total, favs, mention)
+
+
+class PickFavView(discord.ui.View):
+    def __init__(
+        self,
+        user_id: int,
+        page: int,
+        total: int,
+        favs: list[dict],
+        mention: discord.User | None,
+    ):
+        super().__init__(timeout=120)
+        offset = page * FAVS_PAGE_SIZE
+        for row_idx, fav in enumerate(favs):
+            short = fav["reason_text"][:38] + ("…" if len(fav["reason_text"]) > 38 else "")
+            self.add_item(PickFavButton(user_id, fav["reason_id"], fav["reason_text"], short, mention, row=row_idx))
+        nav_row = min(len(favs), 4)
+        if page > 0:
+            self.add_item(PickFavNavButton("◀ Prev", user_id, page - 1, mention, nav_row))
+        if offset + FAVS_PAGE_SIZE < total:
+            self.add_item(PickFavNavButton("Next ▶", user_id, page + 1, mention, nav_row))
+
+
+class PickFavButton(discord.ui.Button):
+    def __init__(
+        self,
+        user_id: int,
+        reason_id: int,
+        reason_text: str,
+        short_text: str,
+        mention: discord.User | None,
+        row: int,
+    ):
+        super().__init__(label=short_text, style=discord.ButtonStyle.primary, row=row)
+        self.user_id     = user_id
+        self.reason_id   = reason_id
+        self.reason_text = reason_text
+        self.mention     = mention
+
+    async def callback(self, interaction: discord.Interaction):
+        if interaction.user.id != self.user_id:
+            await interaction.response.send_message("These aren't your favourites!", ephemeral=True)
+            return
+        await interaction.response.defer()
+        reason  = {"id": self.reason_id, "reason": self.reason_text}
+        embed   = make_reason_embed(reason)
+        content = self.mention.mention if self.mention else None
+        await interaction.followup.send(content=content, embed=embed)
+        await interaction.edit_original_response(
+            embed=discord.Embed(title="✅ Reason sent!", color=EMBED_COLOR),
+            view=None,
+        )
+
+
+class PickFavNavButton(discord.ui.Button):
+    def __init__(self, label: str, user_id: int, target_page: int, mention: discord.User | None, row: int):
+        super().__init__(label=label, style=discord.ButtonStyle.secondary, row=row)
+        self.user_id     = user_id
+        self.target_page = target_page
+        self.mention     = mention
+
+    async def callback(self, interaction: discord.Interaction):
+        if interaction.user.id != self.user_id:
+            await interaction.response.send_message("These aren't your favourites!", ephemeral=True)
+            return
+        await interaction.response.defer()
+        embed, view = build_pickfav_page(self.user_id, self.target_page, self.mention)
+        await interaction.edit_original_response(embed=embed, view=view)
+
+
+@bot.tree.command(name="pickfav", description="Send one of your saved favourites as a message")
+@app_commands.describe(mention="Optionally ping a user along with the reason")
+async def cmd_pickfav(
+    interaction: discord.Interaction,
+    mention: discord.User | None = None,
+):
+    await interaction.response.defer(ephemeral=True)
+    embed, view = build_pickfav_page(interaction.user.id, 0, mention)
+    await interaction.followup.send(embed=embed, view=view, ephemeral=True)
+
+
 # ── /stats ────────────────────────────────────────────────────────────────────
 
 @bot.tree.command(name="stats", description="View cross-platform usage statistics")
@@ -544,6 +655,8 @@ async def cmd_help(interaction: discord.Interaction):
             f"👤 `/no mention:@user` - Ping someone with a reason\n"
             f"🔢 `/no count:5` - Get multiple reasons at once (max 23)\n"
             f"⭐ `/myfavs` - Browse and manage your saved favourites\n"
+            f"📤 `/pickfav` - Pick a saved favourite to send as a message\n"
+            f"👤 `/pickfav mention:@user` - Pick a favourite and ping someone with it\n"
             f"📊 `/stats` - Cross-platform usage chart\n"
             f"❓ `/help` - Show this message"
         ),
