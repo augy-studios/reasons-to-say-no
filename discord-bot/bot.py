@@ -357,7 +357,7 @@ class RtsnBot(commands.Bot):
     async def _update_presence(self):
         count = len(self.guilds)
         await self.change_presence(
-            activity=discord.Game(name=f"saying NO to {count} guild{'s' if count != 1 else ''}")
+            activity=discord.CustomActivity(name=f"Saying NO to {count} guild{'s' if count != 1 else ''}")
         )
 
 
