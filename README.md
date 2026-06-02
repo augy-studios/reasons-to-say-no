@@ -26,7 +26,7 @@ A **Stats for Nerds** page at [no.uwuapps.org/stats](https://no.uwuapps.org/stat
 
 ## Telegram Bot
 
-[@no_reasons_bot](https://t.me/no_reasons_bot) - send `/no` to get a reason, `/myfavs` to browse saved favourites, `/stats` for cross-platform usage charts, and `/help` for the full command list.
+[@no_reasons_bot](https://t.me/no_reasons_bot) - send `/no` to get a reason, `/myfavs` to browse saved favourites, `/stats` for cross-platform usage charts, and `/start` for the full command list.
 
 Inline mode is also supported: type `@no_reasons_bot` followed by a space in any chat to get a random reason or one of your saved favourites without leaving the conversation.
 
