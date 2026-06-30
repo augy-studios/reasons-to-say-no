@@ -137,7 +137,7 @@ async function fetchReason() {
     setFavouriteCardState(false);
 
     try {
-        const res = await fetch('/api/get-reason');
+        const res = await signedFetch('/api/get-reason');
         const json = await res.json();
 
         if (!res.ok || !json.success) {
@@ -165,7 +165,7 @@ async function fetchReason() {
 
 async function trackStat(platform) {
     try {
-        await fetch('/api/track-stat', {
+        await signedFetch('/api/track-stat', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -471,8 +471,9 @@ if ('serviceWorker' in navigator) {
 
 /* -- INIT -- */
 
-(function init() {
+(async function init() {
     initTheme();
     refreshFavBadge();
+    await initGuestKey('reasons-to-say-no'); // no login on this site - every visitor signs as a guest
     fetchReason(); // triggers X anim + loads first reason
 })();

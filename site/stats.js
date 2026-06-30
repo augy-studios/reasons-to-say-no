@@ -496,7 +496,7 @@ function showChartsError(message) {
 
 async function loadStats() {
     try {
-        const res = await fetch('/api/get-stats');
+        const res = await signedFetch('/api/get-stats');
         const json = await res.json();
         if (!json.success) throw new Error(json.error || 'Server error');
 
@@ -541,8 +541,9 @@ document.addEventListener('keydown', e => {
 
 /* -- INIT -- */
 
-(function init() {
+(async function init() {
     initTheme();
     refreshFavBadge();
+    await initGuestKey('reasons-to-say-no'); // no login on this site - every visitor signs as a guest
     loadStats();
 })();
