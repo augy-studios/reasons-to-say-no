@@ -1,4 +1,4 @@
-const CACHE = "justsayno-v1";
+const CACHE = "justsayno-v2";
 
 const ASSETS = [
   "/",

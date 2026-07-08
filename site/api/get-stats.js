@@ -32,14 +32,18 @@ module.exports = async (req, res) => {
     }
 
     try {
-        const {
-            data,
-            error
-        } = await supabase
-            .from('no_stats')
-            .select('platform, created_at');
+        const data = [];
+        const pageSize = 1000;
+        for (let from = 0; ; from += pageSize) {
+            const { data: page, error } = await supabase
+                .from('no_stats')
+                .select('platform, created_at')
+                .range(from, from + pageSize - 1);
 
-        if (error) throw error;
+            if (error) throw error;
+            data.push(...page);
+            if (page.length < pageSize) break;
+        }
 
         // Total stats
         const counts = {};

@@ -67,10 +67,26 @@ class PgDatabase:
         except Exception as exc:
             logger.error("log_stat failed: %s", exc)
 
+    async def _fetch_all_stats(self, since: str | None = None) -> list[dict]:
+        # PostgREST caps unpaginated selects at 1000 rows, so page through with .range().
+        rows: list[dict] = []
+        page_size = 1000
+        start = 0
+        while True:
+            query = self._client.table("no_stats").select("platform, created_at")
+            if since is not None:
+                query = query.gte("created_at", since)
+            res = await query.range(start, start + page_size - 1).execute()
+            rows.extend(res.data)
+            if len(res.data) < page_size:
+                break
+            start += page_size
+        return rows
+
     async def get_stats_by_platform(self) -> list[dict]:
         try:
-            res = await self._client.table("no_stats").select("platform").execute()
-            counts = Counter(row["platform"] for row in res.data)
+            rows = await self._fetch_all_stats()
+            counts = Counter(row["platform"] for row in rows)
             return [
                 {"platform": p, "count": c}
                 for p, c in sorted(counts.items(), key=lambda x: -x[1])
@@ -82,15 +98,10 @@ class PgDatabase:
     async def get_stats_by_day(self, days: int = 7) -> list[dict]:
         try:
             since = (datetime.now(timezone.utc) - timedelta(days=days)).isoformat()
-            res = (
-                await self._client.table("no_stats")
-                .select("platform, created_at")
-                .gte("created_at", since)
-                .execute()
-            )
+            rows = await self._fetch_all_stats(since=since)
 
             day_counts: dict = defaultdict(lambda: defaultdict(int))
-            for row in res.data:
+            for row in rows:
                 day = row["created_at"][:10]  # YYYY-MM-DD
                 day_counts[day][row["platform"]] += 1
 
@@ -105,8 +116,8 @@ class PgDatabase:
 
     async def get_total_stats(self) -> dict:
         try:
-            res = await self._client.table("no_stats").select("platform").execute()
-            counts = Counter(row["platform"] for row in res.data)
+            rows = await self._fetch_all_stats()
+            counts = Counter(row["platform"] for row in rows)
             return {
                 "total":    sum(counts.values()),
                 "webapp":   counts.get("webapp",   0),
