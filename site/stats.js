@@ -1,42 +1,3 @@
-/* -- THEMES (shared with script.js) -- */
-
-const THEMES = [{
-        id: 'classic',
-        label: 'Classic',
-        color: '#ccffcc'
-    },
-    {
-        id: 'not-green-1',
-        label: 'Not Green 1',
-        color: '#ffcccc'
-    },
-    {
-        id: 'not-green-2',
-        label: 'Not Green 2',
-        color: '#ccccff'
-    },
-    {
-        id: 'not-green-3',
-        label: 'Not Green 3',
-        color: '#ffffcc'
-    },
-    {
-        id: 'not-green-4',
-        label: 'Not Green 4',
-        color: '#ffccff'
-    },
-    {
-        id: 'not-green-5',
-        label: 'Not Green 5',
-        color: '#ccffff'
-    },
-    {
-        id: 'pure-white',
-        label: 'Really Really\nLight Green',
-        color: '#ffffff'
-    },
-];
-
 /* -- PLATFORM CONFIG -- */
 
 const PLATFORMS = {
@@ -60,78 +21,37 @@ const PLATFORMS = {
 
 /* -- STORAGE KEYS -- */
 
-const KEY_THEME = 'rtsn_theme';
 const KEY_FAVS = 'rtsn_favourites';
 
 /* -- DOM REFS -- */
 
 const toastContainer = document.getElementById('toastContainer');
-const themeNavBtn = document.getElementById('themeNavBtn');
-const themeModal = document.getElementById('themeModal');
-const themeModalClose = document.getElementById('themeModalClose');
-const themeModalBackdrop = document.getElementById('themeModalBackdrop');
-const themeGrid = document.getElementById('themeGrid');
 
 const favouritesNavBtn = document.getElementById('favouritesNavBtn');
 const favouritesModal = document.getElementById('favouritesModal');
-const favouritesModalClose = document.getElementById('favouritesModalClose');
-const favouritesModalBackdrop = document.getElementById('favouritesModalBackdrop');
 const favouritesList = document.getElementById('favouritesList');
 const favBadge = document.getElementById('favBadge');
 
 const statsSummary = document.getElementById('statsSummary');
 const chartsGrid = document.getElementById('chartsGrid');
 
-/* -- THEME -- */
+/* -- CHART COLOURS -- */
 
-function applyTheme(themeId) {
-    const theme = THEMES.find(t => t.id === themeId) || THEMES[0];
-    document.documentElement.style.setProperty('--brand', theme.color);
-
-    const metaEl = document.getElementById('metaThemeColour');
-    if (metaEl) metaEl.setAttribute('content', theme.color);
-
-    localStorage.setItem(KEY_THEME, themeId);
-
-    document.querySelectorAll('.theme-option').forEach(el => {
-        const active = el.dataset.theme === themeId;
-        el.classList.toggle('active', active);
-        el.setAttribute('aria-pressed', String(active));
-    });
-}
-
-function buildThemeGrid() {
-    const savedId = localStorage.getItem(KEY_THEME) || 'classic';
-
-    themeGrid.innerHTML = THEMES.map(t => {
-        const active = t.id === savedId;
-        const extraBorder = t.color === '#ffffff' ? 'border: 2px solid #d1d5db;' : '';
-        const labelHtml = t.label.replace('\n', '<br>');
-        return `
-      <button
-        class="theme-option${active ? ' active' : ''}"
-        data-theme="${t.id}"
-        aria-label="Select ${t.label.replace('\n', ' ')} theme"
-        aria-pressed="${active}"
-      >
-        <span class="theme-swatch" style="background-color:${t.color};${extraBorder}"></span>
-        <span class="theme-name">${labelHtml}</span>
-      </button>
-    `;
-    }).join('');
-
-    themeGrid.querySelectorAll('.theme-option').forEach(btn => {
-        btn.addEventListener('click', () => {
-            applyTheme(btn.dataset.theme);
-            closeModal(themeModal);
-            showToast('Theme applied');
-        });
-    });
-}
-
-function initTheme() {
-    const savedId = localStorage.getItem(KEY_THEME) || 'classic';
-    applyTheme(savedId);
+// Chart.js paints to canvas, so it cannot use CSS variables. Resolve the
+// theme tokens at build time so charts stay readable in both modes.
+function chartColours() {
+    const css = getComputedStyle(document.documentElement);
+    const read = name => css.getPropertyValue(name).trim();
+    const ink = read('--ink');
+    const n = parseInt(ink.replace('#', ''), 16);
+    const inkRgb = `${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}`;
+    return {
+        ink,
+        muted: read('--muted'),
+        border: read('--surface-border'),
+        grid: `rgba(${inkRgb}, 0.10)`,
+        segment: `rgba(${inkRgb}, 0.18)`,
+    };
 }
 
 /* -- FAVOURITES -- */
@@ -233,20 +153,6 @@ function clearAllFavourites() {
     saveFavourites([]);
     renderFavourites();
     showToast('All favourites cleared');
-}
-
-/* -- MODAL -- */
-
-function openModal(modal) {
-    modal.classList.add('open');
-    document.body.style.overflow = 'hidden';
-    const closeBtn = modal.querySelector('.modal-close');
-    if (closeBtn) setTimeout(() => closeBtn.focus(), 50);
-}
-
-function closeModal(modal) {
-    modal.classList.remove('open');
-    document.body.style.overflow = '';
 }
 
 /* -- TOAST -- */
@@ -351,6 +257,8 @@ function renderPieChart(byPlatform) {
         return;
     }
 
+    const c = chartColours();
+
     new Chart(ctx.getContext('2d'), {
         type: 'doughnut',
         data: {
@@ -359,8 +267,8 @@ function renderPieChart(byPlatform) {
                 data: filtered.map(p => p.count),
                 backgroundColor: filtered.map(p => PLATFORMS[p.platform].color),
                 borderWidth: 3,
-                borderColor: 'rgba(255,255,255,0.85)',
-                hoverBorderColor: 'rgba(255,255,255,1)',
+                borderColor: c.segment,
+                hoverBorderColor: c.border,
                 hoverOffset: 6,
             }]
         },
@@ -375,7 +283,7 @@ function renderPieChart(byPlatform) {
                             family: 'Jua',
                             size: 12
                         },
-                        color: '#374151',
+                        color: c.ink,
                         padding: 16,
                         usePointStyle: true,
                         pointStyleWidth: 10,
@@ -405,6 +313,8 @@ function renderBarChart(byDay) {
         const entry = byDay.find(r => r.day === day && r.platform === platform);
         return entry ? entry.count : 0;
     }
+
+    const c = chartColours();
 
     const datasets = Object.entries(PLATFORMS).map(([key, p]) => ({
         label: p.label,
@@ -436,13 +346,13 @@ function renderBarChart(byDay) {
                             family: 'Jua',
                             size: 11
                         },
-                        color: '#6b7280',
+                        color: c.muted,
                     }
                 },
                 y: {
                     stacked: true,
                     grid: {
-                        color: 'rgba(0,0,0,0.06)'
+                        color: c.grid
                     },
                     border: {
                         display: false,
@@ -453,7 +363,7 @@ function renderBarChart(byDay) {
                             family: 'Jua',
                             size: 11
                         },
-                        color: '#6b7280',
+                        color: c.muted,
                         precision: 0,
                         maxTicksLimit: 6,
                     }
@@ -467,7 +377,7 @@ function renderBarChart(byDay) {
                             family: 'Jua',
                             size: 12
                         },
-                        color: '#374151',
+                        color: c.ink,
                         padding: 16,
                         usePointStyle: true,
                         pointStyleWidth: 10,
@@ -489,7 +399,7 @@ function renderBarChart(byDay) {
 }
 
 function showChartsError(message) {
-    chartsGrid.innerHTML = `<p class="stats-error">${escapeHtml(message)}<br><br><a href="/stats" style="color:var(--text-secondary)">Reload page</a></p>`;
+    chartsGrid.innerHTML = `<p class="stats-error">${escapeHtml(message)}<br><br><a href="/stats">Reload page</a></p>`;
 }
 
 /* -- FETCH STATS -- */
@@ -518,31 +428,25 @@ async function loadStats() {
 
 /* -- EVENT LISTENERS -- */
 
-themeNavBtn.addEventListener('click', () => {
-    buildThemeGrid();
-    openModal(themeModal);
-});
-themeModalClose.addEventListener('click', () => closeModal(themeModal));
-themeModalBackdrop.addEventListener('click', () => closeModal(themeModal));
-
+// Theme button and close/backdrop clicks are wired in theme.js.
 favouritesNavBtn.addEventListener('click', () => {
     renderFavourites();
-    openModal(favouritesModal);
+    hydrateIcons(favouritesModal);
+    openModal('favouritesModal');
+    const closeBtn = favouritesModal.querySelector('[data-close-modal]'); // focus for a11y
+    if (closeBtn) setTimeout(() => closeBtn.focus(), 50);
 });
-favouritesModalClose.addEventListener('click', () => closeModal(favouritesModal));
-favouritesModalBackdrop.addEventListener('click', () => closeModal(favouritesModal));
 
 document.addEventListener('keydown', e => {
     if (e.key === 'Escape') {
-        closeModal(themeModal);
-        closeModal(favouritesModal);
+        closeModal('themeModal');
+        closeModal('favouritesModal');
     }
 });
 
 /* -- INIT -- */
 
 (async function init() {
-    initTheme();
     refreshFavBadge();
     await initGuestKey('reasons-to-say-no'); // no login on this site - every visitor signs as a guest
     loadStats();

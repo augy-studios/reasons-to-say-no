@@ -34,9 +34,19 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="Say No" />
 
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Jua">
+    <script>
+        (function () {
+            var k = "rtsn";
+            var m = localStorage.getItem(k + ".mode") || "light";
+            var c = localStorage.getItem(k + ".colorTheme") || "classic";
+            document.documentElement.setAttribute("data-mode", m);
+            document.documentElement.setAttribute("data-color-theme", c);
+        })();
+    </script>
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&display=swap">
+    <link rel="stylesheet" href="/css/theme.css">
     <link rel="stylesheet" href="/style.css">
-    <meta name="theme-color" content="#ccffcc" />
 
     <!-- Embed Image -->
     <link rel="apple-touch-icon" href="/RTSN-main.png">
@@ -120,17 +130,8 @@
             </button>
 
             <!-- Theme Picker -->
-            <button class="nav-pill icon-only" id="themeNavBtn" title="Change Theme" aria-label="Open theme picker">
-                <svg class="icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none"
-                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                    aria-hidden="true">
-                    <circle cx="13.5" cy="6.5" r="1" fill="currentColor" stroke="none" />
-                    <circle cx="17.5" cy="10.5" r="1" fill="currentColor" stroke="none" />
-                    <circle cx="8.5" cy="7.5" r="1" fill="currentColor" stroke="none" />
-                    <circle cx="6.5" cy="12.5" r="1" fill="currentColor" stroke="none" />
-                    <path
-                        d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z" />
-                </svg>
+            <button class="icon-btn" id="themeBtn" type="button" aria-label="Theme">
+                <span data-icon="sun"></span>
             </button>
 
             <!-- Buy Augy a Coffee -->
@@ -210,7 +211,7 @@
     <footer class="footer" role="contentinfo">
         <span class="footer-text">
             Made with
-            <svg class="heart-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="#22c55e"
+            <svg class="heart-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="#34c759"
                 aria-label="love" role="img">
                 <path
                     d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
@@ -221,38 +222,13 @@
         </span>
     </footer>
 
-    <!-- THEME MODAL -->
-    <div class="modal" id="themeModal" role="dialog" aria-modal="true" aria-labelledby="themeModalTitle">
-        <div class="modal-backdrop" id="themeModalBackdrop"></div>
-        <div class="modal-sheet glass">
-            <div class="modal-header">
-                <h2 class="modal-title" id="themeModalTitle">Pick a Theme</h2>
-                <button class="modal-close" id="themeModalClose" aria-label="Close theme picker">
-                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor"
-                        stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                        <line x1="18" y1="6" x2="6" y2="18" />
-                        <line x1="6" y1="6" x2="18" y2="18" />
-                    </svg>
-                </button>
-            </div>
-            <div class="theme-grid" id="themeGrid">
-                <!-- Populated by app.js -->
-            </div>
-        </div>
-    </div>
-
     <!-- FAVOURITES MODAL -->
-    <div class="modal" id="favouritesModal" role="dialog" aria-modal="true" aria-labelledby="favouritesModalTitle">
-        <div class="modal-backdrop" id="favouritesModalBackdrop"></div>
-        <div class="modal-sheet glass">
-            <div class="modal-header">
-                <h2 class="modal-title" id="favouritesModalTitle">Favourites</h2>
-                <button class="modal-close" id="favouritesModalClose" aria-label="Close favourites">
-                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor"
-                        stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                        <line x1="18" y1="6" x2="6" y2="18" />
-                        <line x1="6" y1="6" x2="18" y2="18" />
-                    </svg>
+    <div class="modal-backdrop hidden" id="favouritesModal">
+        <div class="modal glass" role="dialog" aria-modal="true" aria-labelledby="favouritesModalTitle">
+            <div class="modal-head">
+                <h2 id="favouritesModalTitle">Favourites</h2>
+                <button class="icon-btn small" type="button" data-close-modal="favouritesModal" aria-label="Close">
+                    <span data-icon="close"></span>
                 </button>
             </div>
             <div class="favourites-list" id="favouritesList" role="list" aria-label="Saved favourite reasons">
@@ -260,7 +236,28 @@
         </div>
     </div>
 
+    <!-- THEME MODAL -->
+    <div class="modal-backdrop hidden" id="themeModal">
+        <div class="modal glass" role="dialog" aria-modal="true" aria-labelledby="themeModalTitle">
+            <div class="modal-head">
+                <h2 id="themeModalTitle">Theme</h2>
+                <button class="icon-btn small" type="button" data-close-modal="themeModal" aria-label="Close">
+                    <span data-icon="close"></span>
+                </button>
+            </div>
+            <p class="modal-section-label">Mode</p>
+            <div class="mode-toggle" id="modeToggle">
+                <button class="mode-btn" type="button" data-mode="light" aria-pressed="false"><span data-icon="sun"></span>Light</button>
+                <button class="mode-btn" type="button" data-mode="dark" aria-pressed="false"><span data-icon="moon"></span>Dark</button>
+            </div>
+            <p class="modal-section-label">Brand colour</p>
+            <div class="swatch-grid" id="swatchGrid"></div>
+        </div>
+    </div>
 
+    <script src="/js/icons.js"></script>
+    <script src="/js/ui.js"></script>
+    <script src="/js/theme.js"></script>
     <script src="/lib/uwu-request-signing.js"></script>
     <script src="/script.js"></script>
 

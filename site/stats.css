@@ -33,13 +33,13 @@ body {
 
 .stats-title {
     font-size: clamp(1.6rem, 4vw, 2.2rem);
-    color: var(--text-primary);
+    color: var(--ink);
     margin-bottom: 8px;
 }
 
 .stats-subtitle {
     font-size: 0.84rem;
-    color: var(--text-muted);
+    color: var(--muted);
     letter-spacing: 0.02em;
 }
 
@@ -79,13 +79,13 @@ body {
 
 .stat-value {
     font-size: clamp(1.35rem, 3vw, 1.9rem);
-    color: var(--text-primary);
+    color: var(--ink);
     line-height: 1;
 }
 
 .stat-label {
     font-size: 0.68rem;
-    color: var(--text-muted);
+    color: var(--muted);
     text-transform: uppercase;
     letter-spacing: 0.1em;
     line-height: 1.3;
@@ -117,7 +117,7 @@ body {
     font-size: 0.88rem;
     text-transform: uppercase;
     letter-spacing: 0.1em;
-    color: var(--text-muted);
+    color: var(--muted);
     text-align: center;
 }
 
@@ -131,7 +131,7 @@ body {
 .stats-error {
     text-align: center;
     padding: 56px 24px;
-    color: var(--text-muted);
+    color: var(--muted);
     font-size: 0.9rem;
     line-height: 1.7;
     grid-column: 1 / -1;
@@ -144,17 +144,17 @@ body {
 }
 
 .footer-stats-link {
-    color: var(--text-muted);
+    color: var(--muted);
     text-decoration: none;
     transition: color var(--fast) var(--ease);
 }
 
 .footer-stats-link:visited {
-    color: var(--text-muted);
+    color: var(--muted);
 }
 
 .footer-stats-link:hover {
-    color: var(--text-secondary);
+    color: var(--brand-ink);
 }
 
 /* -- RESPONSIVE -- */

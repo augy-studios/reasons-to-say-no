@@ -1,9 +1,13 @@
-const CACHE = "justsayno-v2";
+const CACHE = "justsayno-v3";
 
 const ASSETS = [
   "/",
   "/index.html",
+  "/css/theme.css",
   "/style.css",
+  "/js/icons.js",
+  "/js/ui.js",
+  "/js/theme.js",
   "/script.js",
   "/stats",
   "/stats.html",
