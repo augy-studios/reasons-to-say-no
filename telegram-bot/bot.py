@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from dotenv import load_dotenv
 from matplotlib import font_manager
-from telethon import Button, TelegramClient, events, types
+from telethon import Button, TelegramClient, events, types, utils
 from telethon.errors import QueryIdInvalidError
 from telethon.tl import functions
 
@@ -163,11 +163,22 @@ STATS_PLATFORMS = [
 ]
 
 
-def build_stats_view(totals: dict) -> tuple[dict, None]:
+async def upload_rich_photo(file_id: str, file: io.BytesIO, peer) -> types.InputRichFilePhoto:
+    """Pre-upload an image so a rich message can embed it as ![](tg://photo?id=<file_id>)."""
+    uploaded = await bot.upload_file(file)
+    media = await bot(functions.messages.UploadMediaRequest(
+        peer=peer, media=types.InputMediaUploadedPhoto(file=uploaded)))
+    return types.InputRichFilePhoto(id=file_id, photo=utils.get_input_photo(media.photo))
+
+
+def build_stats_view(totals: dict, chart: types.InputRichFilePhoto | None) -> tuple[dict, None]:
     rows = [[icon, name, f"{totals[key]:,}"] for icon, name, key in STATS_PLATFORMS]
+    # Media is its own block, sitting between the total line and the table.
+    chart_block = f"![](tg://photo?id={chart.id})\n\n" if chart else ""
     markdown = (
         "# 📊 Usage Statistics\n\n"
         f"All time - **{totals['total']:,}** total fetches\n\n"
+        + chart_block
         + md_table(["Platform", "Fetches"], rows)
     )
     fallback = (
@@ -175,7 +186,10 @@ def build_stats_view(totals: dict) -> tuple[dict, None]:
         f"Total fetches: {totals['total']:,}\n"
         + "\n".join(f"{icon} {name}: {totals[key]:,}" for icon, name, key in STATS_PLATFORMS)
     )
-    return {"markdown": markdown, "fallback": fallback}, None
+    rich = {"markdown": markdown, "fallback": fallback}
+    if chart:
+        rich["files"] = [chart]
+    return rich, None
 
 
 def build_about_view(count: int) -> tuple[dict, list]:
@@ -312,10 +326,19 @@ async def cmd_stats(event):
     by_day      = await pg.get_stats_by_day(7)
     img = build_stats_chart(by_platform, by_day, totals)
 
-    # Media sends can't carry a rich message, so the chart goes first and the
-    # per-platform table follows as its own rich message.
-    await event.respond(file=img)
-    rich, _ = build_stats_view(totals)
+    # Pre-upload the chart so the rich message can embed it inline. If even
+    # that fails, send the classic photo + plain caption instead.
+    try:
+        chart = await upload_rich_photo("chart", img, event.chat_id)
+    except Exception as err:
+        logger.warning("[cmd_stats] chart upload failed, sending plain photo: %s", err)
+        rich, _ = build_stats_view(totals, None)
+        img.seek(0)
+        await event.respond(rich["fallback"], file=img)
+        return
+
+    rich, _ = build_stats_view(totals, chart)
+    rich["fallback_file"] = img  # rejected rich payload => photo + plain caption
     await send_rich_message(bot, event.chat_id, rich)
 
 

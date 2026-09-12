@@ -39,6 +39,8 @@ Tap any result to send it as a reason card in the current chat. Stats are logged
 
 Structured replies (`/start`, `/no`, `/myfavs`, `/stats`, `/about`, the reason card and inline results) are sent as native Telegram [Rich Messages](https://core.telegram.org/bots/features#rich-messages) - real headings and tables rather than Markdown approximations. This needs `telethon>=1.44.0`; the raw TL helpers live in `reply.py`, and every one of them falls back to the plain-text version of the same content (logged as `falling back`) if Telegram rejects the rich payload.
 
+The `/stats` chart is pre-uploaded with `messages.uploadMedia` and embedded inside the rich message as a `![](tg://photo?id=chart)` media block between the total and the per-platform table, so the numbers and the picture arrive as one message.
+
 ---
 
 ## Data storage

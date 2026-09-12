@@ -15,7 +15,17 @@ logger = logging.getLogger("rtsn-bot")
 
 
 def _rich_markdown(rich):
-    return types.InputRichMessageMarkdown(markdown=rich["markdown"])
+    # Optional rich["files"]: InputRichFilePhoto/Document entries referenced from
+    # the markdown as ![](tg://photo?id=<id>) media blocks.
+    return types.InputRichMessageMarkdown(markdown=rich["markdown"], files=rich.get("files") or None)
+
+
+def _fallback_file(rich):
+    """Optional rich["fallback_file"]: media to attach if we drop to plain text."""
+    file = rich.get("fallback_file")
+    if hasattr(file, "seek"):
+        file.seek(0)  # may already have been read by the rich upload
+    return file
 
 
 # Editing without reply_markup keeps the old keyboard; an empty inline
@@ -43,7 +53,8 @@ async def send_rich_message(client, entity, rich, buttons=None):
             rich_message=_rich_markdown(rich), reply_markup=markup))
     except Exception as err:
         logger.warning("[send_rich_message] rich send failed, falling back: %s", err)
-        return await client.send_message(entity, rich["fallback"], buttons=buttons)
+        return await client.send_message(entity, rich["fallback"], buttons=buttons,
+                                         file=_fallback_file(rich))
 
 
 async def edit_rich_message_at(client, peer, msg_id, rich, buttons=None):
