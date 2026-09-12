@@ -4,6 +4,7 @@ import asyncio
 import io
 import logging
 import os
+import re
 import urllib.request
 from collections import defaultdict
 from pathlib import Path
@@ -13,11 +14,13 @@ import matplotlib.pyplot as plt
 import numpy as np
 from dotenv import load_dotenv
 from matplotlib import font_manager
-from telethon import Button, TelegramClient, events
-from telethon.errors import MessageNotModifiedError, QueryIdInvalidError
+from telethon import Button, TelegramClient, events, types
+from telethon.errors import QueryIdInvalidError
+from telethon.tl import functions
 
 from database import Database
 from pg import PgDatabase
+from reply import edit_rich_message, edit_rich_message_at, send_rich_message, sent_message_id
 
 matplotlib.use("Agg")
 load_dotenv()
@@ -85,8 +88,153 @@ def reason_buttons(reason_id: int) -> list:
     ]
 
 
-def format_reason(reason: dict) -> str:
-    return f"**Reason to say no:**\n\n__{reason['reason']}__"
+def link_buttons() -> list:
+    return [[Button.url("📖  API Docs", API_DOCS_URL), Button.url("🌐  Web App", WEBAPP_URL)]]
+
+
+# Rich Markdown formatting
+#
+# Structured views return {"markdown": <Rich Markdown>, "fallback": <plain text>}.
+# `markdown` is what current clients render natively; `fallback` fills the
+# required `message=` field and is what old clients see.
+
+_MD_SPECIAL = re.compile(r"([\\*_~`|\[\]#>=])")
+
+
+def escape_md(text) -> str:
+    """Escape user/data text for Telegram's Rich Markdown dialect."""
+    return _MD_SPECIAL.sub(r"\\\1", str(text))
+
+
+def escape_cell(text) -> str:
+    """Escape for a GFM table cell; also flattens newlines so the row stays intact."""
+    return escape_md(str(text).replace("\n", " "))
+
+
+def md_table(headers: list[str], rows: list[list]) -> str:
+    """Pipe table with a blank-header leading column (used for an icon)."""
+    lines = ["| " + " | ".join(["", *headers]) + " |",
+             "| " + " | ".join(["---"] * (len(headers) + 1)) + " |"]
+    for row in rows:
+        lines.append("| " + " | ".join(escape_cell(v) for v in row) + " |")
+    return "\n".join(lines)
+
+
+# View builders - each returns (rich, buttons)
+
+def build_reason_view(reason: dict) -> tuple[dict, list]:
+    rich = {
+        "markdown": f"# Reason to say no\n\n*{escape_md(reason['reason'])}*",
+        "fallback": f"Reason to say no:\n\n{reason['reason']}",
+    }
+    return rich, reason_buttons(reason["id"])
+
+
+START_COMMANDS = [
+    ("🎲", "/no",     "Get a random reason to say no"),
+    ("⭐", "/fav",    "Save the last reason to your favourites"),
+    ("📋", "/myfavs", "Browse your saved favourites"),
+    ("📊", "/stats",  "View cross-platform usage stats as a chart"),
+    ("ℹ️", "/about",  "About this project"),
+]
+
+
+def build_start_view() -> tuple[dict, list]:
+    markdown = (
+        "# Reasons to Say No\n\n"
+        "Here's what I can do:\n\n"
+        + md_table(["Command", "Description"], [list(r) for r in START_COMMANDS])
+        + "\n\n*In a group, mention me or use /cmd@username to talk to me.*"
+    )
+    fallback = (
+        "Reasons to Say No\n\n"
+        "Here's what I can do:\n\n"
+        + "\n".join(f"{icon} {cmd} - {desc}" for icon, cmd, desc in START_COMMANDS)
+        + "\n\nIn a group, mention me or use /cmd@username to talk to me."
+    )
+    return {"markdown": markdown, "fallback": fallback}, link_buttons()
+
+
+STATS_PLATFORMS = [
+    ("🌐", "Web app",  "webapp"),
+    ("✈️", "Telegram", "telegram"),
+    ("🎮", "Discord",  "discord"),
+    ("🔌", "API",      "api"),
+]
+
+
+def build_stats_view(totals: dict) -> tuple[dict, None]:
+    rows = [[icon, name, f"{totals[key]:,}"] for icon, name, key in STATS_PLATFORMS]
+    markdown = (
+        "# 📊 Usage Statistics\n\n"
+        f"All time - **{totals['total']:,}** total fetches\n\n"
+        + md_table(["Platform", "Fetches"], rows)
+    )
+    fallback = (
+        "📊 Usage Statistics (all time)\n\n"
+        f"Total fetches: {totals['total']:,}\n"
+        + "\n".join(f"{icon} {name}: {totals[key]:,}" for icon, name, key in STATS_PLATFORMS)
+    )
+    return {"markdown": markdown, "fallback": fallback}, None
+
+
+def build_about_view(count: int) -> tuple[dict, list]:
+    markdown = (
+        "# ℹ️ About Reasons to Say No\n\n"
+        "An open project by **Augy** / UwU Apps.\n\n"
+        f"There are currently **{count:,}** reasons in the database, "
+        "fetched live on every request.\n\n"
+        "📖 The API is free and open for anyone to use."
+    )
+    fallback = (
+        "ℹ️ About Reasons to Say No\n\n"
+        "An open project by Augy / UwU Apps.\n\n"
+        f"There are currently {count:,} reasons in the database, "
+        "fetched live on every request.\n\n"
+        "📖 The API is free and open for anyone to use."
+    )
+    return {"markdown": markdown, "fallback": fallback}, link_buttons()
+
+
+def build_favs_view(user_id: int, page: int, total: int, favs: list[dict]) -> tuple[dict, list | None]:
+    if not favs:
+        rich = {
+            "markdown": (
+                "# 📋 Your Favourites\n\n"
+                "Nothing saved yet.\n\n"
+                "Use /no to get a reason, then tap **⭐ Save** to keep it here."
+            ),
+            "fallback": (
+                "📋 Your Favourites\n\n"
+                "Nothing saved yet.\n\n"
+                "Use /no to get a reason, then tap ⭐ Save to keep it here."
+            ),
+        }
+        return rich, None
+
+    offset  = page * FAVS_PAGE_SIZE
+    md_lines = [f"# 📋 Your Favourites\n\n{total} total\n"]
+    txt_lines = [f"📋 Your Favourites ({total} total)\n"]
+    for i, fav in enumerate(favs, start=offset + 1):
+        # Bold numbers rather than "1." so the dialect never renumbers the page.
+        md_lines.append(f"**{i}.** *{escape_md(fav['reason_text'])}*\n")
+        txt_lines.append(f"{i}. {fav['reason_text']}\n")
+    rich = {"markdown": "\n".join(md_lines), "fallback": "\n".join(txt_lines)}
+
+    buttons = []
+    for fav in favs:
+        short = fav["reason_text"][:35] + ("…" if len(fav["reason_text"]) > 35 else "")
+        buttons.append([Button.inline(f"🗑️  {short}", data=f"unfav:{fav['reason_id']}:{page}")])
+
+    nav_row = []
+    if page > 0:
+        nav_row.append(Button.inline("◀  Prev", data=f"favpage:{user_id}:{page - 1}"))
+    if offset + FAVS_PAGE_SIZE < total:
+        nav_row.append(Button.inline("Next  ▶", data=f"favpage:{user_id}:{page + 1}"))
+    if nav_row:
+        buttons.append(nav_row)
+
+    return rich, buttons
 
 
 # Reason sender
@@ -97,13 +245,15 @@ async def send_reason(event):
         await event.respond("❌  Couldn't reach the database right now - try again in a moment.")
         return None
 
-    msg = await event.respond(
-        format_reason(reason),
-        buttons=reason_buttons(reason["id"]),
-    )
-    db.upsert_active_button(msg.id, event.chat_id, event.sender_id, reason["id"], reason["reason"])
+    rich, buttons = build_reason_view(reason)
+    result = await send_rich_message(bot, event.chat_id, rich, buttons)
+    msg_id = sent_message_id(result)
+    if msg_id is None:
+        logger.warning("send_reason: could not determine sent message id from %r", type(result))
+    else:
+        db.upsert_active_button(msg_id, event.chat_id, event.sender_id, reason["id"], reason["reason"])
     asyncio.create_task(pg.log_stat("telegram"))
-    return msg
+    return result
 
 
 # Commands
@@ -113,20 +263,8 @@ async def cmd_start(event):
     if not is_for_bot(event.raw_text):
         return
 
-    text = (
-        "**Reasons to Say No**\n\n"
-        "Here's what I can do:\n\n"
-        "🎲 /no - Get a random reason to say no\n"
-        "⭐ /fav - Save the last reason to your favourites\n"
-        "📋 /myfavs - Browse your saved favourites\n"
-        "📊 /stats - View cross-platform usage stats as a chart\n"
-        "ℹ️ /about - About this project\n\n"
-        "__In a group, mention me or use__ `/cmd@username` __to talk to me.__"
-    )
-    await event.respond(
-        text,
-        buttons=[[Button.url("📖  API Docs", API_DOCS_URL), Button.url("🌐  Web App", WEBAPP_URL)]],
-    )
+    rich, buttons = build_start_view()
+    await send_rich_message(bot, event.chat_id, rich, buttons)
 
 
 @bot.on(events.NewMessage(pattern=r"^/no(?:@\w+)?$"))
@@ -174,15 +312,11 @@ async def cmd_stats(event):
     by_day      = await pg.get_stats_by_day(7)
     img = build_stats_chart(by_platform, by_day, totals)
 
-    caption = (
-        f"📊  **Usage Statistics** (all time)\n\n"
-        f"Total fetches: **{totals['total']:,}**\n"
-        f"🌐 Web app:   **{totals['webapp']:,}**\n"
-        f"✈️ Telegram:   **{totals['telegram']:,}**\n"
-        f"🎮 Discord:    **{totals['discord']:,}**\n"
-        f"🔌 API:        **{totals['api']:,}**"
-    )
-    await event.respond(caption, file=img)
+    # Media sends can't carry a rich message, so the chart goes first and the
+    # per-platform table follows as its own rich message.
+    await event.respond(file=img)
+    rich, _ = build_stats_view(totals)
+    await send_rich_message(bot, event.chat_id, rich)
 
 
 @bot.on(events.NewMessage(pattern=r"^/about(?:@\w+)?$"))
@@ -191,20 +325,23 @@ async def cmd_about(event):
         return
 
     count = await pg.get_reason_count()
-    text = (
-        f"ℹ️  **About Reasons to Say No**\n\n"
-        f"An open project by **Augy** / UwU Apps.\n\n"
-        f"There are currently **{count:,}** reasons in the database, "
-        f"fetched live on every request.\n\n"
-        f"📖 The API is free and open for anyone to use."
-    )
-    await event.respond(
-        text,
-        buttons=[[Button.url("📖  API Docs", API_DOCS_URL), Button.url("🌐  Web App", WEBAPP_URL)]],
-    )
+    rich, buttons = build_about_view(count)
+    await send_rich_message(bot, event.chat_id, rich, buttons)
 
 
 # Inline queries
+
+def inline_reason_result(result_id: str, title: str, reason: dict) -> types.InputBotInlineResult:
+    # event.builder.article can't carry a rich message, so build the raw result.
+    rich, _ = build_reason_view(reason)
+    return types.InputBotInlineResult(
+        id=result_id, type="article", title=title, description=reason["reason"],
+        send_message=types.InputBotInlineMessageRichMessage(
+            rich_message=types.InputRichMessageMarkdown(markdown=rich["markdown"]),
+            reply_markup=None,
+        ),
+    )
+
 
 @bot.on(events.InlineQuery())
 async def inline_handler(event):
@@ -212,21 +349,20 @@ async def inline_handler(event):
     results = []
 
     if reason:
-        results.append(event.builder.article(
-            title="🎲 Random Reason",
-            description=reason["reason"],
-            text=f"__{reason['reason']}__",
-        ))
+        results.append(inline_reason_result(f"rnd:{reason['id']}", "🎲 Random Reason", reason))
 
     favs = db.get_favourites(event.sender_id, limit=50, offset=0)
     for i, fav in enumerate(favs, start=1):
-        results.append(event.builder.article(
-            title=f"⭐ Favourited Reason {i}",
-            description=fav["reason_text"],
-            text=f"__{fav['reason_text']}__",
+        results.append(inline_reason_result(
+            f"fav:{fav['reason_id']}", f"⭐ Favourited Reason {i}",
+            {"id": fav["reason_id"], "reason": fav["reason_text"]},
         ))
 
-    await event.answer(results, cache_time=0)
+    try:
+        await bot(functions.messages.SetInlineBotResultsRequest(
+            query_id=event.query.query_id, results=results, cache_time=0))
+    except QueryIdInvalidError:
+        return
     if reason:
         asyncio.create_task(pg.log_stat("telegram"))
 
@@ -248,10 +384,8 @@ async def cb_new_reason(event):
             pass
         return
 
-    try:
-        await event.edit(format_reason(reason), buttons=reason_buttons(reason["id"]))
-    except MessageNotModifiedError:
-        pass
+    rich, buttons = build_reason_view(reason)
+    await edit_rich_message(bot, event, rich, buttons)
 
     db.upsert_active_button(event.message_id, event.chat_id, event.sender_id, reason["id"], reason["reason"])
     asyncio.create_task(pg.log_stat("telegram"))
@@ -318,47 +452,20 @@ async def send_favs_page(event, user_id: int, page: int, send_new: bool):
     offset = page * FAVS_PAGE_SIZE
     favs   = db.get_favourites(user_id, limit=FAVS_PAGE_SIZE, offset=offset)
 
-    if not favs and page == 0:
-        text = (
-            "📋  **Your Favourites**\n\n"
-            "Nothing saved yet.\n\n"
-            "Use /no to get a reason, then tap **⭐ Save** to keep it here."
-        )
-        if send_new:
-            await event.respond(text)
-        else:
-            try:
-                await event.edit(text, buttons=None)
-            except (MessageNotModifiedError, Exception):
-                pass
+    if not favs and page > 0:
+        # Page emptied out (last favourite on it removed) - fall back a page.
+        await send_favs_page(event, user_id, page=page - 1, send_new=send_new)
         return
 
-    lines = [f"📋  **Your Favourites** ({total} total)\n"]
-    for i, fav in enumerate(favs, start=offset + 1):
-        lines.append(f"**{i}.** __{fav['reason_text']}__\n")
-
-    text    = "\n".join(lines)
-    buttons = []
-
-    for fav in favs:
-        short = fav["reason_text"][:35] + ("…" if len(fav["reason_text"]) > 35 else "")
-        buttons.append([Button.inline(f"🗑️  {short}", data=f"unfav:{fav['reason_id']}:{page}")])
-
-    nav_row = []
-    if page > 0:
-        nav_row.append(Button.inline("◀  Prev", data=f"favpage:{user_id}:{page - 1}"))
-    if offset + FAVS_PAGE_SIZE < total:
-        nav_row.append(Button.inline("Next  ▶", data=f"favpage:{user_id}:{page + 1}"))
-    if nav_row:
-        buttons.append(nav_row)
+    rich, buttons = build_favs_view(user_id, page, total, favs)
 
     if send_new:
-        await event.respond(text, buttons=buttons)
+        await send_rich_message(bot, event.chat_id, rich, buttons)
+    elif buttons:
+        await edit_rich_message(bot, event, rich, buttons)
     else:
-        try:
-            await event.edit(text, buttons=buttons)
-        except MessageNotModifiedError:
-            pass
+        # Empty list: edit by id so the stale 🗑️/nav keyboard is removed.
+        await edit_rich_message_at(bot, event.chat_id, event.message_id, rich)
 
 
 # Stats chart

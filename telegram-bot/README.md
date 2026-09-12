@@ -31,7 +31,13 @@ The bot supports Telegram inline mode. Type `@no_reasons_bot` followed by a spac
 - **🎲 Random Reason** - a fresh random reason fetched from the database
 - **⭐ Favourited Reason 1, 2, …** - your saved favourites (up to 50), listed in order
 
-Tap any result to send it as a plain message in the current chat. Stats are logged for the random reason result only.
+Tap any result to send it as a reason card in the current chat. Stats are logged for the random reason result only.
+
+---
+
+## Rich Messages
+
+Structured replies (`/start`, `/no`, `/myfavs`, `/stats`, `/about`, the reason card and inline results) are sent as native Telegram [Rich Messages](https://core.telegram.org/bots/features#rich-messages) - real headings and tables rather than Markdown approximations. This needs `telethon>=1.44.0`; the raw TL helpers live in `reply.py`, and every one of them falls back to the plain-text version of the same content (logged as `falling back`) if Telegram rejects the rich payload.
 
 ---
 
