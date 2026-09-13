@@ -21,7 +21,8 @@ A PWA that generates a compelling reason to say no on demand.
 ├── stats.html          ← Stats for Nerds page
 ├── stats.css           ← Stats page styles (overrides + additions)
 ├── stats.js            ← Stats page client-side logic (charts, theme, favourites)
-├── sw.js               ← Service worker (PWA caching)
+├── sw.js               ← Service worker (PWA caching); bump VERSION on every deploy
+├── js/sw-update.js     ← Registers the worker and shows the "new version ready" bar
 ├── manifest.json       ← PWA manifest
 ├── package.json        ← Serverless dependencies
 └── api/
@@ -36,7 +37,11 @@ A PWA that generates a compelling reason to say no on demand.
 
 ### `/` - Main App
 
-Get a random reason to say no. Regenerate, share, or save to favourites. Theme picker with 7 colour options. Works offline via service worker.
+Get a random reason to say no. Regenerate, share, or save to favourites. Theme picker with 7 colour options and light / dark / time-based mode. Works offline via service worker.
+
+### Updates
+
+A new service worker never activates on its own. It installs, waits, and the page shows a bar at the top ("A new version of Reasons to Say No is ready." with Reload / Not now). Nothing reloads until the reader presses Reload. For the bar to appear at all, `VERSION` in `sw.js` must change on every deploy that touches anything the worker serves.
 
 ### `/stats` - Stats for Nerds
 

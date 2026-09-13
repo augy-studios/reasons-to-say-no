@@ -1,4 +1,9 @@
-const CACHE = "justsayno-v4";
+/* Service worker. Bump VERSION on every deploy that changes anything this
+   worker serves: the browser compares this file byte for byte, and an
+   unchanged file means no update is ever offered to anybody. */
+
+const VERSION = "5";
+const CACHE = `justsayno-v${VERSION}`;
 
 const ASSETS = [
   "/",
@@ -8,27 +13,35 @@ const ASSETS = [
   "/js/icons.js",
   "/js/ui.js",
   "/js/theme.js",
+  "/js/sw-update.js",
   "/script.js",
   "/stats",
   "/stats.html",
   "/stats.css",
   "/stats.js",
   "/RTSN-main.png",
+  "/RTSN-192.png",
+  "/RTSN-512.png",
   "/favicon.ico",
   "/manifest.json"
 ];
 
-/* -- Install: cache shell -- */
+/* -- Install: cache shell, then wait --
+   No skipWaiting() here. The new worker downloads, installs, and waits until
+   somebody presses Reload on the update bar. Promoting it silently would
+   leave the open page running old JavaScript against new cached assets. */
 
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE)
     .then(cache => cache.addAll(ASSETS))
-    .then(() => self.skipWaiting())
   );
 });
 
-/* -- Activate: clean old caches -- */
+/* -- Activate: clean old caches --
+   No clients.claim() here either. The page that accepted the update is
+   claimed from the message handler below, and any other page picks up the
+   new worker on its next navigation. */
 
 self.addEventListener('activate', event => {
   event.waitUntil(
@@ -40,8 +53,17 @@ self.addEventListener('activate', event => {
         .map(k => caches.delete(k))
       )
     )
-    .then(() => self.clients.claim())
   );
+});
+
+/* -- Message: the only place a waiting worker is promoted -- */
+
+self.addEventListener('message', event => {
+  const type = typeof event.data === 'string' ? event.data : event.data?.type;
+
+  if (type === 'skip-waiting') {
+    event.waitUntil(self.skipWaiting().then(() => self.clients.claim()));
+  }
 });
 
 /* -- Fetch: strategy per route -- */

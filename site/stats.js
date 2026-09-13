@@ -259,6 +259,7 @@ function renderPieChart(byPlatform) {
 
     const c = chartColours();
 
+    Chart.getChart(ctx)?.destroy();
     new Chart(ctx.getContext('2d'), {
         type: 'doughnut',
         data: {
@@ -324,6 +325,7 @@ function renderBarChart(byDay) {
         borderSkipped: false,
     }));
 
+    Chart.getChart(ctx)?.destroy();
     new Chart(ctx.getContext('2d'), {
         type: 'bar',
         data: {
@@ -404,9 +406,13 @@ function showChartsError(message) {
 
 /* -- FETCH STATS -- */
 
+// Kept so the charts can be rebuilt with fresh token colours when the mode
+// changes underneath them (time based mode crossing 09:00 or 18:00).
+let lastChartData = null;
+
 async function loadStats() {
     try {
-        const res = await signedFetch('/api/get-stats');
+        const res = await fetch('/api/get-stats');
         const json = await res.json();
         if (!json.success) throw new Error(json.error || 'Server error');
 
@@ -416,6 +422,7 @@ async function loadStats() {
             byDay
         } = json.data;
 
+        lastChartData = { byPlatform, byDay };
         renderSummaryCards(totalStats);
         renderPieChart(byPlatform);
         renderBarChart(byDay);
@@ -444,10 +451,17 @@ document.addEventListener('keydown', e => {
     }
 });
 
+// Chart.js baked the old mode's colours into the canvas; repaint on a clock
+// boundary so the charts stay readable in the mode the page is now in.
+document.addEventListener('uwu:modechange', () => {
+    if (!lastChartData) return;
+    renderPieChart(lastChartData.byPlatform);
+    renderBarChart(lastChartData.byDay);
+});
+
 /* -- INIT -- */
 
-(async function init() {
+(function init() {
     refreshFavBadge();
-    await initGuestKey('reasons-to-say-no'); // no login on this site - every visitor signs as a guest
     loadStats();
 })();

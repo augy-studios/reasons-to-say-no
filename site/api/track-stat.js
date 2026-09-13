@@ -1,9 +1,6 @@
 const {
     createClient
 } = require('@supabase/supabase-js');
-const {
-    verifySignedRequest
-} = require('../lib/uwu-request-signing-server');
 
 const supabase = createClient(
     process.env.SUPABASE_URL,
@@ -15,21 +12,13 @@ const VALID_PLATFORMS = new Set(['webapp', 'telegram', 'discord', 'api']);
 module.exports = async (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, X-Request-Token, X-Request-TS, X-Key-ID');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
     if (req.method === 'OPTIONS') return res.status(200).end();
     if (req.method !== 'POST') {
         return res.status(405).json({
             success: false,
             error: 'Method not allowed'
-        });
-    }
-
-    const verification = await verifySignedRequest(req, supabase);
-    if (!verification.valid) {
-        return res.status(403).json({
-            success: false,
-            error: verification.reason
         });
     }
 

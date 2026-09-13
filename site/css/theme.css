@@ -186,7 +186,8 @@ body.modal-open { overflow: hidden; }
 
 /* ---- mode toggle ---- */
 .mode-toggle {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
   gap: 6px;
   padding: 4px;
   border-radius: 14px;
@@ -210,6 +211,18 @@ body.modal-open { overflow: hidden; }
 .mode-btn.active {
   background: var(--brand-fill);
   color: var(--on-brand);
+}
+
+/* Time based mode only. Light and dark stay side by side and the third
+   spans the row beneath them: two equal columns would put the longer label
+   in a box too narrow to read at 320px, and the full width row also signals
+   this is a different kind of choice, a rule for picking a mode rather than
+   a mode. */
+.mode-btn-wide { grid-column: 1 / -1; }
+.mode-note {
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--muted);
 }
 
 /* ---- swatch grid ---- */

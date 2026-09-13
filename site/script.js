@@ -35,7 +35,7 @@ async function fetchReason() {
     setFavouriteCardState(false);
 
     try {
-        const res = await signedFetch('/api/get-reason');
+        const res = await fetch('/api/get-reason');
         const json = await res.json();
 
         if (!res.ok || !json.success) {
@@ -63,7 +63,7 @@ async function fetchReason() {
 
 async function trackStat(platform) {
     try {
-        await signedFetch('/api/track-stat', {
+        await fetch('/api/track-stat', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -336,19 +336,11 @@ document.addEventListener('keydown', e => {
     }
 });
 
-/* -- SERVICE WORKER -- */
-
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js')
-            .catch(err => console.warn('[RTSN] SW registration failed:', err));
-    });
-}
-
 /* -- INIT -- */
 
-(async function init() {
+// Service worker registration and the update bar live in js/sw-update.js.
+
+(function init() {
     refreshFavBadge();
-    await initGuestKey('reasons-to-say-no'); // no login on this site - every visitor signs as a guest
     fetchReason(); // triggers X anim + loads first reason
 })();

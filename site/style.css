@@ -99,6 +99,85 @@ a {
   }
 }
 
+/* -- UPDATE BAR -- */
+
+/* Drawn by js/sw-update.js when a new service worker is waiting. Sits above
+   the navbar as the first child of body: full width, quieter than the
+   header, tinted enough to read as a notice rather than as layout. */
+.update-notice {
+  flex-shrink: 0;
+  background: color-mix(in srgb, var(--brand) 25%, var(--surface));
+  border-bottom: 1px solid var(--surface-border);
+  color: var(--ink);
+  font-size: 0.875rem;
+  animation: updateNoticeIn var(--fast) var(--ease);
+}
+
+@keyframes updateNoticeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.update-notice-inner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: 8px 24px;
+  /* Under the notch on a phone, where the bar is the topmost thing on screen. */
+  padding-top: max(8px, env(safe-area-inset-top));
+}
+
+.update-notice p {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.update-notice .btn {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  height: 32px;
+  padding: 0 14px;
+  border-radius: var(--r-full);
+  border: 1px solid var(--surface-border);
+  font-size: 0.82rem;
+  white-space: nowrap;
+  transition: background var(--fast) var(--ease),
+    color var(--fast) var(--ease),
+    transform var(--fast) var(--ease);
+}
+
+.update-notice .btn:active {
+  transform: scale(0.96);
+}
+
+.update-notice .btn-primary {
+  background: var(--brand-fill);
+  color: var(--on-brand);
+}
+
+.update-notice .btn-primary:hover {
+  background: var(--brand-fill-strong);
+}
+
+.update-notice .btn-quiet {
+  background: var(--surface-strong);
+  color: var(--muted-strong);
+}
+
+.update-notice .btn-quiet:hover {
+  color: var(--ink);
+}
+
 /* -- NAVIGATION -- */
 
 .navbar {
@@ -564,6 +643,16 @@ a {
 /* -- RESPONSIVE -- */
 
 @media (max-width: 600px) {
+  .update-notice-inner {
+    flex-wrap: wrap;
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  .update-notice p {
+    flex-basis: 100%;
+  }
+
   .navbar {
     height: auto;
     min-height: var(--nav-h);
